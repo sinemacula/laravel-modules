@@ -23,6 +23,6 @@ if (!function_exists('module_path')) { // @codeCoverageIgnoreStart
      */
     function module_path(string $path = ''): string
     {
-        return Modules::modulesPath() . ($path ? DIRECTORY_SEPARATOR . $path : '');
+        return Modules::modulesPath().($path ? DIRECTORY_SEPARATOR.$path : '');
     }
 } // @codeCoverageIgnoreEnd

@@ -21,6 +21,4 @@ return (new Config)
     ->setUsingCache(true)
     ->setRiskyAllowed(true)
     ->setParallelConfig(ParallelConfigFactory::detect())
-    ->setRules(array_merge($rules, [
-        'concat_space' => ['spacing' => 'none'],
-    ]));
+    ->setRules($rules);

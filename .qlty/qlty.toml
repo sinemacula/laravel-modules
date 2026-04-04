@@ -85,6 +85,8 @@ package_filters = ["slevomat", "dealerdirect"]
 
 [[plugin]]
 name = "php-cs-fixer"
+package_file = "composer.json"
+package_filters = ["sinemacula"]
 
 [[plugin]]
 name = "radarlint-php"

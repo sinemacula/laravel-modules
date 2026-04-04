@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f8abbbc9e9bf14da48521cfb92c13289",
+    "content-hash": "f6d6d446aab1eb0368503ea2a5d47f46",
     "packages": [
         {
             "name": "brick/math",
@@ -10144,6 +10144,38 @@
             "time": "2025-02-07T05:00:38+00:00"
         },
         {
+            "name": "sinemacula/coding-standards",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sinemacula/coding-standards.git",
+                "reference": "e06766d8e2ada6f5a4d8b26dcba16ac5d45c3db9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sinemacula/coding-standards/zipball/e06766d8e2ada6f5a4d8b26dcba16ac5d45c3db9",
+                "reference": "e06766d8e2ada6f5a4d8b26dcba16ac5d45c3db9",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.3"
+            },
+            "default-branch": true,
+            "type": "library",
+            "authors": [
+                {
+                    "name": "Ben Carey",
+                    "email": "bdmc@sinemacula.co.uk"
+                }
+            ],
+            "description": "Centralized coding standards, static analysis configurations, and code quality tooling for all Sine Macula repositories.",
+            "support": {
+                "source": "https://github.com/sinemacula/coding-standards/tree/master",
+                "issues": "https://github.com/sinemacula/coding-standards/issues"
+            },
+            "time": "2026-04-04T06:09:35+00:00"
+        },
+        {
             "name": "slevomat/coding-standard",
             "version": "8.28.1",
             "source": {
@@ -10754,8 +10786,10 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": {},
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "sinemacula/coding-standards": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

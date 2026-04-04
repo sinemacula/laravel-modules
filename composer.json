@@ -35,6 +35,7 @@
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^12.5",
+        "sinemacula/coding-standards": "dev-master",
         "slevomat/coding-standard": "^8.28",
         "squizlabs/php_codesniffer": "^4.0"
     },
@@ -87,6 +88,12 @@
             "phpstan/extension-installer": true
         }
     },
-    "minimum-stability": "stable",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/sinemacula/coding-standards"
+        }
+    ],
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

@@ -12,7 +12,7 @@
 
 use SineMacula\Laravel\Modules\Configuration\Modules;
 
-if (!function_exists('module_path')) { // @codeCoverageIgnore
+if (!function_exists('module_path')) { // @codeCoverageIgnoreStart
     /**
      * Get the path to the modules directory.
      *
@@ -25,4 +25,4 @@ if (!function_exists('module_path')) { // @codeCoverageIgnore
     {
         return Modules::modulesPath() . ($path ? DIRECTORY_SEPARATOR . $path : '');
     }
-}
+} // @codeCoverageIgnoreEnd

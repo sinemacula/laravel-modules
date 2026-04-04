@@ -10149,19 +10149,25 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sinemacula/coding-standards.git",
-                "reference": "e06766d8e2ada6f5a4d8b26dcba16ac5d45c3db9"
+                "reference": "6927eb2819daa9bba17f3a7c76f4e051f0a6bf7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sinemacula/coding-standards/zipball/e06766d8e2ada6f5a4d8b26dcba16ac5d45c3db9",
-                "reference": "e06766d8e2ada6f5a4d8b26dcba16ac5d45c3db9",
+                "url": "https://api.github.com/repos/sinemacula/coding-standards/zipball/6927eb2819daa9bba17f3a7c76f4e051f0a6bf7a",
+                "reference": "6927eb2819daa9bba17f3a7c76f4e051f0a6bf7a",
                 "shasum": ""
             },
             "require": {
+                "friendsofphp/php-cs-fixer": "^3.0",
                 "php": "^8.3"
             },
             "default-branch": true,
             "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SineMacula\\CodingStandards\\": "src/"
+                }
+            },
             "authors": [
                 {
                     "name": "Ben Carey",
@@ -10173,7 +10179,7 @@
                 "source": "https://github.com/sinemacula/coding-standards/tree/master",
                 "issues": "https://github.com/sinemacula/coding-standards/issues"
             },
-            "time": "2026-04-04T06:09:35+00:00"
+            "time": "2026-04-04T15:25:42+00:00"
         },
         {
             "name": "slevomat/coding-standard",

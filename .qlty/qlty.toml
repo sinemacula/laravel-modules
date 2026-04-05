@@ -66,7 +66,7 @@ default = true
 
 [[source]]
 name = "sinemacula"
-repository = "git@github.com:sinemacula/coding-standards.git"
+repository = "https://github.com/sinemacula/coding-standards"
 branch = "master"
 
 [[plugin]]

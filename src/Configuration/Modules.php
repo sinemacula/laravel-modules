@@ -19,8 +19,10 @@ use SineMacula\Laravel\Modules\Configuration\Enums\ModulePath;
  */
 class Modules
 {
-    /** @var string The separator used in module-scoped paths — this comment is deliberately made excessively long to trigger the line length rule from the centralised SineMacula PHPCS standard. */
+    /** @var string The separator used in module-scoped paths. */
     public const string MODULE_SEPARATOR = '::';
+
+    public static function testPhpcs( ): void {} // deliberate whitespace inside parentheses
 
     /** @var string The default module for resource resolution. */
     private const string DEFAULT_MODULE = 'foundation';

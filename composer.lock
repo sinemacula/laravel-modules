@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f6d6d446aab1eb0368503ea2a5d47f46",
+    "content-hash": "7ca7273d93cf3000fd7bea44b28992f6",
     "packages": [
         {
             "name": "brick/math",
@@ -10145,23 +10145,22 @@
         },
         {
             "name": "sinemacula/coding-standards",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sinemacula/coding-standards.git",
-                "reference": "10b5c6fa9a33c6965f073e9fa37548770eec241e"
+                "reference": "18c69d83c834b071d8b8da83c84da474b812131c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sinemacula/coding-standards/zipball/10b5c6fa9a33c6965f073e9fa37548770eec241e",
-                "reference": "10b5c6fa9a33c6965f073e9fa37548770eec241e",
+                "url": "https://api.github.com/repos/sinemacula/coding-standards/zipball/18c69d83c834b071d8b8da83c84da474b812131c",
+                "reference": "18c69d83c834b071d8b8da83c84da474b812131c",
                 "shasum": ""
             },
             "require": {
                 "friendsofphp/php-cs-fixer": "^3.0",
                 "php": "^8.3"
             },
-            "default-branch": true,
             "type": "phpcodesniffer-standard",
             "extra": {
                 "phpstan": {
@@ -10176,6 +10175,10 @@
                     "SineMacula\\CodingStandards\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
             "authors": [
                 {
                     "name": "Ben Carey",
@@ -10184,10 +10187,10 @@
             ],
             "description": "Centralized coding standards, static analysis configurations, and code quality tooling for all Sine Macula repositories.",
             "support": {
-                "source": "https://github.com/sinemacula/coding-standards/tree/master",
-                "issues": "https://github.com/sinemacula/coding-standards/issues"
+                "issues": "https://github.com/sinemacula/coding-standards/issues",
+                "source": "https://github.com/sinemacula/coding-standards/tree/v1.0.0"
             },
-            "time": "2026-04-05T00:36:13+00:00"
+            "time": "2026-04-05T01:24:24+00:00"
         },
         {
             "name": "slevomat/coding-standard",
@@ -10800,10 +10803,8 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {
-        "sinemacula/coding-standards": 20
-    },
+    "minimum-stability": "stable",
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

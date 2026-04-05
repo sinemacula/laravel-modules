@@ -28,6 +28,8 @@ class ModuleServiceProvider extends ServiceProvider
     #[\Override]
     public function register(): void
     {
+        Modules::setBasePath($this->app->basePath());
+
         $this->registerCommands();
     }
 

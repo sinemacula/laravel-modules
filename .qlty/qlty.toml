@@ -64,6 +64,11 @@ mode = "comment"
 name = "default"
 default = true
 
+[[source]]
+name = "sinemacula"
+repository = "git@github.com:sinemacula/coding-standards.git"
+branch = "master"
+
 [[plugin]]
 name = "actionlint"
 

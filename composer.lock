@@ -10149,12 +10149,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sinemacula/coding-standards.git",
-                "reference": "6927eb2819daa9bba17f3a7c76f4e051f0a6bf7a"
+                "reference": "d36464450789c5c2b0b3e1f4620a8065e2df8e42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sinemacula/coding-standards/zipball/6927eb2819daa9bba17f3a7c76f4e051f0a6bf7a",
-                "reference": "6927eb2819daa9bba17f3a7c76f4e051f0a6bf7a",
+                "url": "https://api.github.com/repos/sinemacula/coding-standards/zipball/d36464450789c5c2b0b3e1f4620a8065e2df8e42",
+                "reference": "d36464450789c5c2b0b3e1f4620a8065e2df8e42",
                 "shasum": ""
             },
             "require": {
@@ -10163,6 +10163,14 @@
             },
             "default-branch": true,
             "type": "library",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "php/phpstan.neon",
+                        "laravel/phpstan.neon"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "SineMacula\\CodingStandards\\": "src/"
@@ -10179,7 +10187,7 @@
                 "source": "https://github.com/sinemacula/coding-standards/tree/master",
                 "issues": "https://github.com/sinemacula/coding-standards/issues"
             },
-            "time": "2026-04-04T15:25:42+00:00"
+            "time": "2026-04-05T00:04:11+00:00"
         },
         {
             "name": "slevomat/coding-standard",

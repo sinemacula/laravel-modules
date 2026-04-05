@@ -247,6 +247,16 @@ class Modules
     }
 
     /**
+     * Temporary method to test PHPStan centralised config in Qlty Cloud.
+     *
+     * @return string
+     */
+    public static function testPHPStanConfig(): string
+    {
+        return 123;
+    }
+
+    /**
      * Return the path to the cache file.
      *
      * @return string

@@ -19,7 +19,7 @@ use SineMacula\Laravel\Modules\Configuration\Enums\ModulePath;
  */
 class Modules
 {
-    /** @var string The separator used in module-scoped paths. */
+    /** @var string The separator used in module-scoped paths — this comment is deliberately made excessively long to trigger the line length rule from the centralised SineMacula PHPCS standard. */
     public const string MODULE_SEPARATOR = '::';
 
     /** @var string The default module for resource resolution. */
@@ -244,16 +244,6 @@ class Modules
         }
 
         return self::$basePath . DIRECTORY_SEPARATOR . $path;
-    }
-
-    /**
-     * Temporary method to test PHPStan centralised config in Qlty Cloud.
-     *
-     * @return string
-     */
-    public static function testPHPStanConfig(): string
-    {
-        return 123;
     }
 
     /**

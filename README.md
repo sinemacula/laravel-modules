@@ -144,8 +144,8 @@ Each module defines its own routes in `Http/routes.php`. These are automatically
 
 ## Requirements
 
-* PHP ^8.3
-* Laravel ^13.0
+- PHP ^8.3
+- Laravel ^13.0
 
 ## Testing
 

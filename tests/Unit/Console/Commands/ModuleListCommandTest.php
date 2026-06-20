@@ -92,6 +92,26 @@ class ModuleListCommandTest extends TestCase
     }
 
     /**
+     * Test that handle renders each module name in its own table cell, distinct
+     * from the path column (which also contains the name as a substring).
+     *
+     * @return void
+     */
+    public function testHandleRendersModuleNamesInOwnColumn(): void
+    {
+        $this->createDirectory('modules/alpha');
+        $this->createDirectory('modules/beta');
+
+        $this->resetModulesState();
+        Modules::setBasePath($this->tempDir);
+
+        $output = $this->runListCommand();
+
+        static::assertMatchesRegularExpression('/\|\s+alpha\s+\|/', $output);
+        static::assertMatchesRegularExpression('/\|\s+beta\s+\|/', $output);
+    }
+
+    /**
      * Test that handle outputs a warning when no modules exist.
      *
      * @return void

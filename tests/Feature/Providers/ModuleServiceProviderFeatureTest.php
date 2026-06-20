@@ -64,10 +64,10 @@ class ModuleServiceProviderFeatureTest extends TestCase
     public function testOptimizationCommandsRegistered(): void
     {
         $this->artisan('module:cache')
-            ->assertExitCode(0); // @phpstan-ignore method.nonObject
+            ->assertExitCode(0); // @phpstan-ignore method.nonObject (untyped pending-command API)
 
         $this->artisan('module:clear')
-            ->assertExitCode(0); // @phpstan-ignore method.nonObject
+            ->assertExitCode(0); // @phpstan-ignore method.nonObject (untyped pending-command API)
     }
 
     /**
@@ -97,7 +97,7 @@ class ModuleServiceProviderFeatureTest extends TestCase
     public function testModuleListCommandRegistered(): void
     {
         $this->artisan('module:list')
-            ->assertExitCode(0); // @phpstan-ignore method.nonObject
+            ->assertExitCode(0); // @phpstan-ignore method.nonObject (untyped pending-command API)
     }
 
     /**
@@ -108,7 +108,7 @@ class ModuleServiceProviderFeatureTest extends TestCase
     public function testModuleMakeCommandRegistered(): void
     {
         $this->artisan('module:make', ['name' => 'TestModule'])
-            ->assertExitCode(0); // @phpstan-ignore method.nonObject
+            ->assertExitCode(0); // @phpstan-ignore method.nonObject (untyped pending-command API)
     }
 
     /**

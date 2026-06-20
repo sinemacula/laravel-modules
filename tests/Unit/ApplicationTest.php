@@ -92,7 +92,9 @@ class ApplicationTest extends TestCase
 
         $app = $this->extractAppFromBuilder($builder);
 
-        static::assertNotEmpty($app->basePath());
+        // The inferred base path must resolve to a real directory (the project
+        // root from which the test suite runs), not merely a non-empty string.
+        static::assertDirectoryExists($app->basePath());
     }
 
     /**
@@ -105,13 +107,13 @@ class ApplicationTest extends TestCase
     {
         $app = new Application($this->tempDir);
 
-        $result = $app->resourcePath();
+        $path = $app->resourcePath();
 
         $resourcesRealPath = realpath(
             $this->tempDir . '/modules/foundation/Resources',
         );
 
-        static::assertSame($resourcesRealPath, $result);
+        static::assertSame($resourcesRealPath, $path);
     }
 
     /**
@@ -135,11 +137,11 @@ class ApplicationTest extends TestCase
 
         $app = new Application($emptyDir);
 
-        $result = $app->resourcePath();
+        $path = $app->resourcePath();
 
         static::assertSame(
             $emptyDir . DIRECTORY_SEPARATOR . 'resources',
-            $result,
+            $path,
         );
 
         $this->removeDirectory($emptyDir);
@@ -159,11 +161,11 @@ class ApplicationTest extends TestCase
             $this->tempDir . '/modules/foundation/Resources',
         );
 
-        $result = $app->resourcePath('views');
+        $path = $app->resourcePath('views');
 
         static::assertSame(
             $resourcesRealPath . DIRECTORY_SEPARATOR . 'views',
-            $result,
+            $path,
         );
     }
 
@@ -181,13 +183,35 @@ class ApplicationTest extends TestCase
             $this->tempDir . '/modules/foundation/Resources',
         );
 
-        $result = $app->resourcePath('foundation::views');
+        $path = $app->resourcePath('foundation::views');
 
         static::assertSame(
             $resourcesRealPath . DIRECTORY_SEPARATOR . 'views',
-            $result,
+            $path,
         );
-        static::assertStringNotContainsString('::', $result);
+        static::assertStringNotContainsString('::', $path);
+    }
+
+    /**
+     * Test that resourcePath only treats the first :: as the module boundary,
+     * preserving any further separators within the sub-path.
+     *
+     * @return void
+     */
+    public function testResourcePathPreservesNestedSeparatorInSubPath(): void
+    {
+        $app = new Application($this->tempDir);
+
+        $resourcesRealPath = realpath(
+            $this->tempDir . '/modules/foundation/Resources',
+        );
+
+        $path = $app->resourcePath('foundation::nested::asset');
+
+        static::assertSame(
+            $resourcesRealPath . DIRECTORY_SEPARATOR . 'nested::asset',
+            $path,
+        );
     }
 
     /**
@@ -199,11 +223,11 @@ class ApplicationTest extends TestCase
     {
         $app = new Application($this->tempDir);
 
-        $result = $app->path();
+        $path = $app->path();
 
         static::assertSame(
             $this->tempDir . DIRECTORY_SEPARATOR . 'modules',
-            $result,
+            $path,
         );
     }
 
@@ -216,13 +240,13 @@ class ApplicationTest extends TestCase
     {
         $app = new Application($this->tempDir);
 
-        $result = $app->path('Models');
+        $path = $app->path('Models');
 
         static::assertSame(
             $this->tempDir
                 . DIRECTORY_SEPARATOR . 'modules'
                 . DIRECTORY_SEPARATOR . 'Models',
-            $result,
+            $path,
         );
     }
 
@@ -242,11 +266,11 @@ class ApplicationTest extends TestCase
         $reflection = new \ReflectionProperty($app, 'appPath');
         $reflection->setValue($app, $customAppPath);
 
-        $result = $app->path('Services');
+        $path = $app->path('Services');
 
         static::assertSame(
             $customAppPath . DIRECTORY_SEPARATOR . 'Services',
-            $result,
+            $path,
         );
     }
 
@@ -261,6 +285,6 @@ class ApplicationTest extends TestCase
     {
         $reflection = new \ReflectionProperty($builder, 'app');
 
-        return $reflection->getValue($builder); // @phpstan-ignore return.type
+        return $reflection->getValue($builder); // @phpstan-ignore return.type (ReflectionProperty::getValue returns mixed; the builder's app property holds an Application)
     }
 }

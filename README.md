@@ -2,6 +2,7 @@
 
 [![Latest Stable Version](https://img.shields.io/packagist/v/sinemacula/laravel-modules.svg)](https://packagist.org/packages/sinemacula/laravel-modules)
 [![Build Status](https://github.com/sinemacula/laravel-modules/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/sinemacula/laravel-modules/actions/workflows/tests.yml)
+[![Quality Gates](https://github.com/sinemacula/laravel-modules/actions/workflows/quality-gates.yml/badge.svg?branch=master)](https://github.com/sinemacula/laravel-modules/actions/workflows/quality-gates.yml)
 [![Maintainability](https://qlty.sh/gh/sinemacula/projects/laravel-modules/maintainability.svg)](https://qlty.sh/gh/sinemacula/projects/laravel-modules)
 [![Code Coverage](https://qlty.sh/gh/sinemacula/projects/laravel-modules/coverage.svg)](https://qlty.sh/gh/sinemacula/projects/laravel-modules)
 [![Total Downloads](https://img.shields.io/packagist/dt/sinemacula/laravel-modules.svg)](https://packagist.org/packages/sinemacula/laravel-modules)
@@ -10,7 +11,7 @@ A lightweight, convention-driven modular architecture package for Laravel. Repla
 `modules/` directory where each subdirectory is a self-contained module following standard Laravel conventions.
 
 Modules are auto-discovered at boot time and cached for performance. All standard Laravel conventions work inside each
-module — there is no new API to learn.
+module - there is no new API to learn.
 
 ## How It Works
 
@@ -47,17 +48,17 @@ modules/
 | Translations      | `Resources/lang/`      | Registered in `ModuleServiceProvider` |
 | Service providers | `Providers/`           | Loaded via `withProviders()`          |
 
-Everything else — controllers, requests, resources, events, observers, policies, models, jobs, mail, notifications —
+Everything else - controllers, requests, resources, events, observers, policies, models, jobs, mail, notifications -
 works via PSR-4 autoloading. No registration required.
 
 ### Artisan Commands
 
-| Command              | Description                                                  |
-|----------------------|--------------------------------------------------------------|
-| `module:make {name}` | Scaffold a new module with the standard directory structure  |
-| `module:list`        | List all discovered modules and their paths                  |
-| `module:cache`       | Cache discovered module paths for faster resolution          |
-| `module:clear`       | Clear the cached module paths                                |
+| Command              | Description                                                 |
+|----------------------|-------------------------------------------------------------|
+| `module:make {name}` | Scaffold a new module with the standard directory structure |
+| `module:list`        | List all discovered modules and their paths                 |
+| `module:cache`       | Cache discovered module paths for faster resolution         |
+| `module:clear`       | Clear the cached module paths                               |
 
 `module:make Billing` creates:
 

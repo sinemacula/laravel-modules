@@ -13,7 +13,7 @@ use SineMacula\Laravel\Modules\Providers\ModuleServiceProvider;
  * @author      Ben Carey <bdmc@sinemacula.co.uk>
  * @copyright   2026 Sine Macula Limited
  *
- * @phpstan-ignore class.childType
+ * @phpstan-ignore class.childType (test double subclasses the service provider to record protected calls)
  */
 class SpyModuleServiceProvider extends ModuleServiceProvider
 {
@@ -33,6 +33,7 @@ class SpyModuleServiceProvider extends ModuleServiceProvider
      * @param  mixed  $namespace
      * @return void
      */
+    #[\Override]
     protected function loadViewsFrom(mixed $path, mixed $namespace): void
     {
         $this->loadViewsFromCalls[] = [$path, $namespace];
@@ -45,6 +46,7 @@ class SpyModuleServiceProvider extends ModuleServiceProvider
      * @param  mixed  $namespace
      * @return void
      */
+    #[\Override]
     protected function loadTranslationsFrom(mixed $path, mixed $namespace = null): void
     {
         $this->loadTranslationsFromCalls[] = [$path, $namespace];
@@ -58,6 +60,7 @@ class SpyModuleServiceProvider extends ModuleServiceProvider
      * @param  string|null  $key
      * @return void
      */
+    #[\Override]
     protected function optimizes(?string $optimize = null, ?string $clear = null, ?string $key = null): void
     {
         $this->optimizesCalls[] = [$optimize, $clear, $key];

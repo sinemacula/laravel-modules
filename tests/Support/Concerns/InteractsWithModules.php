@@ -60,7 +60,7 @@ trait InteractsWithModules
      */
     protected function createModuleStructure(array $modules): void
     {
-        /** @phpstan-ignore property.notFound */
+        /** @phpstan-ignore property.notFound (tempDir is provided by the ManagesTemporaryFiles trait composed alongside this one) */
         $base = $this->tempDir;
 
         $modulesDir = $base . DIRECTORY_SEPARATOR . 'modules';

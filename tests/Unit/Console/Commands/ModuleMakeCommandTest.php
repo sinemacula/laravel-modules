@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\Support\Concerns\InteractsWithModules;
 use Tests\Support\Concerns\ManagesTemporaryFiles;
+use Tests\Support\Spies\RecordingFilesystem;
 
 /**
  * Unit tests for the ModuleMakeCommand.
@@ -27,6 +28,12 @@ class ModuleMakeCommandTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
+    /** @var string The output captured from the most recent command run. */
+    private string $output = '';
+
+    /** @var \Tests\Support\Spies\RecordingFilesystem The filesystem used by the most recent run. */
+    private RecordingFilesystem $filesystem;
+
     /**
      * Set up the test environment.
      *
@@ -39,6 +46,8 @@ class ModuleMakeCommandTest extends TestCase
         $this->createTempDirectory('make_cmd_test_');
         $this->createDirectory('modules');
         $this->createDirectory('bootstrap/cache');
+
+        $this->filesystem = new RecordingFilesystem;
 
         $this->initModules($this->tempDir);
     }
@@ -76,29 +85,32 @@ class ModuleMakeCommandTest extends TestCase
     }
 
     /**
-     * Test that handle creates .gitkeep files in each directory.
+     * Test that handle writes a .gitkeep file into each module directory at the
+     * expected path.
      *
      * @return void
      */
-    public function testHandleCreatesGitkeepFiles(): void
+    public function testHandleWritesGitkeepFilesToEachDirectory(): void
     {
         $this->runMakeCommand('billing');
 
         $modulePath = $this->modulePath('Billing');
+        $written    = $this->filesystem->writtenPaths();
 
-        static::assertFileExists($modulePath . '/Console/Commands/.gitkeep');
-        static::assertFileExists($modulePath . '/Http/Controllers/.gitkeep');
-        static::assertFileExists($modulePath . '/Http/Requests/.gitkeep');
-        static::assertFileExists($modulePath . '/Listeners/.gitkeep');
-        static::assertFileExists($modulePath . '/Models/.gitkeep');
+        static::assertContains($modulePath . '/Console/Commands/.gitkeep', $written);
+        static::assertContains($modulePath . '/Http/Controllers/.gitkeep', $written);
+        static::assertContains($modulePath . '/Http/Requests/.gitkeep', $written);
+        static::assertContains($modulePath . '/Listeners/.gitkeep', $written);
+        static::assertContains($modulePath . '/Models/.gitkeep', $written);
     }
 
     /**
-     * Test that handle creates a routes.php file with the correct content.
+     * Test that handle writes a routes.php file to the module Http directory
+     * with the expected content.
      *
      * @return void
      */
-    public function testHandleCreatesRoutesFile(): void
+    public function testHandleWritesRoutesFileWithExpectedContent(): void
     {
         $this->runMakeCommand('billing');
 
@@ -106,12 +118,14 @@ class ModuleMakeCommandTest extends TestCase
             . DIRECTORY_SEPARATOR . 'Http'
             . DIRECTORY_SEPARATOR . 'routes.php';
 
-        static::assertFileExists($routesFile);
+        $routes = array_values(array_filter(
+            $this->filesystem->writes,
+            static fn (array $write): bool => $write['path'] === $routesFile,
+        ));
 
-        $content = file_get_contents($routesFile);
-
-        static::assertStringContainsString('<?php', $content);
-        static::assertStringContainsString('use Illuminate\Support\Facades\Route;', $content);
+        static::assertCount(1, $routes);
+        static::assertStringContainsString('<?php', $routes[0]['contents']);
+        static::assertStringContainsString('use Illuminate\Support\Facades\Route;', $routes[0]['contents']);
     }
 
     /**
@@ -155,6 +169,32 @@ class ModuleMakeCommandTest extends TestCase
     }
 
     /**
+     * Test that handle outputs the success message when the module is created.
+     *
+     * @return void
+     */
+    public function testHandleOutputsSuccessMessageOnCreation(): void
+    {
+        $this->runMakeCommand('billing');
+
+        static::assertStringContainsString('Module [Billing] created successfully', $this->output);
+    }
+
+    /**
+     * Test that handle outputs an error message when the module already exists.
+     *
+     * @return void
+     */
+    public function testHandleOutputsErrorWhenModuleExists(): void
+    {
+        $this->createDirectory('modules/Billing');
+
+        $this->runMakeCommand('billing');
+
+        static::assertStringContainsString('Module [Billing] already exists', $this->output);
+    }
+
+    /**
      * Run the module:make command with the given name.
      *
      * @param  string  $name
@@ -167,10 +207,16 @@ class ModuleMakeCommandTest extends TestCase
         $command = new ModuleMakeCommand;
         $command->setLaravel($app);
 
-        return $command->run(
+        $output = new BufferedOutput;
+
+        $exitCode = $command->run(
             new ArrayInput(['name' => $name]),
-            new BufferedOutput,
+            $output,
         );
+
+        $this->output = $output->fetch();
+
+        return $exitCode;
     }
 
     /**
@@ -195,7 +241,7 @@ class ModuleMakeCommandTest extends TestCase
     {
         $app = new Application($this->tempDir);
 
-        $app->instance(Filesystem::class, new Filesystem);
+        $app->instance(Filesystem::class, $this->filesystem);
 
         return $app;
     }

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Facade;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use SineMacula\Laravel\Modules\Configuration\Modules;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleCacheCommand;
@@ -340,6 +341,27 @@ class ModuleServiceProviderTest extends TestCase
     }
 
     /**
+     * Test that register sets the module base path from the application, so
+     * subsequent path resolution targets the application root.
+     *
+     * @return void
+     */
+    #[RunInSeparateProcess]
+    public function testRegisterSetsBasePathFromApplication(): void
+    {
+        $app = new \Illuminate\Foundation\Application($this->tempDir);
+
+        $provider = new ModuleServiceProvider($app);
+
+        $provider->register();
+
+        static::assertSame(
+            $this->tempDir . DIRECTORY_SEPARATOR . 'modules',
+            Modules::modulesPath(),
+        );
+    }
+
+    /**
      * Create a spy provider that tracks calls to protected methods.
      *
      * @return \Tests\Support\Spies\SpyModuleServiceProvider
@@ -349,6 +371,6 @@ class ModuleServiceProviderTest extends TestCase
         /** @var \Illuminate\Contracts\Foundation\Application&\Mockery\MockInterface $app */
         $app = \Mockery::mock(Application::class);
 
-        return new SpyModuleServiceProvider($app); // @phpstan-ignore argument.type
+        return new SpyModuleServiceProvider($app); // @phpstan-ignore argument.type (the Mockery mock satisfies the Application contract the provider needs at runtime)
     }
 }

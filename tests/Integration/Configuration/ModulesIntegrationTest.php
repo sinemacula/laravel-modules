@@ -149,8 +149,8 @@ class ModulesIntegrationTest extends TestCase
         $content = file_get_contents($cachePath);
         static::assertStringStartsWith('<?php', $content);
 
-        $result = require $cachePath;
-        static::assertIsArray($result);
+        $modules = require $cachePath;
+        static::assertIsArray($modules);
     }
 
     /**
@@ -176,13 +176,13 @@ class ModulesIntegrationTest extends TestCase
      */
     public function testResourcePathResolvesNamespacedModule(): void
     {
-        $result = Modules::resourcePath('alpha::views');
+        $path = Modules::resourcePath('alpha::views');
 
         $expected = realpath(
             $this->tempDir . '/modules/alpha/Resources',
         );
 
-        static::assertSame($expected, $result);
+        static::assertSame($expected, $path);
     }
 
     /**
@@ -193,9 +193,9 @@ class ModulesIntegrationTest extends TestCase
      */
     public function testResourcePathFallsBackToDefaultModule(): void
     {
-        $result = Modules::resourcePath('views');
+        $path = Modules::resourcePath('views');
 
-        static::assertSame('', $result);
+        static::assertSame('', $path);
     }
 
     /**
@@ -322,7 +322,7 @@ class ModulesIntegrationTest extends TestCase
      */
     private function createDirectoryStructure(): void
     {
-        // Alpha module — fully populated
+        // Alpha module - fully populated
         $this->createDirectory('modules/alpha/Resources/views');
         $this->createDirectory('modules/alpha/Resources/lang');
         $this->createDirectory('modules/alpha/Http');
@@ -338,11 +338,11 @@ class ModulesIntegrationTest extends TestCase
             "<?php\n",
         );
 
-        // Beta module — partial
+        // Beta module - partial
         $this->createDirectory('modules/beta/Resources');
         $this->createDirectory('modules/beta/Http');
 
-        // Gamma module — empty
+        // Gamma module - empty
         $this->createDirectory('modules/gamma');
 
         // Bootstrap cache directory

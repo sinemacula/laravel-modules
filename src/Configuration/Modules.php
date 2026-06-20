@@ -3,6 +3,7 @@
 namespace SineMacula\Laravel\Modules\Configuration;
 
 use SineMacula\Laravel\Modules\Configuration\Enums\ModulePath;
+use SineMacula\Laravel\Modules\Exceptions\ModuleException;
 
 /**
  * Manages the discovery, caching, and retrieval of application modules.
@@ -50,9 +51,7 @@ class Modules
      *
      * @return void
      *
-     * @throws \RuntimeException
-     *
-     * @SuppressWarnings("php:S112")
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function cache(): void
     {
@@ -63,14 +62,14 @@ class Modules
         $tempPath  = $cachePath . '.tmp';
 
         if (file_put_contents($tempPath, $content) === false) {
-            throw new \RuntimeException('Failed to write cache file at ' . $cachePath . '.');
+            throw new ModuleException('Failed to write cache file at ' . $cachePath . '.');
         }
 
         if (!rename($tempPath, $cachePath)) { // @codeCoverageIgnoreStart
 
             @unlink($tempPath);
 
-            throw new \RuntimeException('Failed to write cache file at ' . $cachePath . '.');
+            throw new ModuleException('Failed to write cache file at ' . $cachePath . '.');
         } // @codeCoverageIgnoreEnd
     }
 
@@ -214,7 +213,13 @@ class Modules
      */
     private static function discoverModules(): array
     {
-        $directory = new \DirectoryIterator(self::modulesPath());
+        $path = self::modulesPath();
+
+        if (!is_dir($path)) {
+            return [];
+        }
+
+        $directory = new \DirectoryIterator($path);
         $modules   = [];
 
         foreach ($directory as $fileInfo) {
@@ -233,14 +238,12 @@ class Modules
      * @param  string  $path
      * @return string
      *
-     * @throws \RuntimeException
-     *
-     * @SuppressWarnings("php:S112")
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     private static function buildPath(string $path): string
     {
         if (!isset(self::$basePath)) {
-            throw new \RuntimeException('No base path has been set.');
+            throw new ModuleException('No base path has been set.');
         }
 
         return self::$basePath . DIRECTORY_SEPARATOR . $path;
@@ -331,6 +334,6 @@ class Modules
 
         $modules = require self::cachePath();
 
-        return is_array($modules) ? $modules : null; // @phpstan-ignore return.type
+        return is_array($modules) ? $modules : null; // @phpstan-ignore return.type (require() of the cache file yields mixed; the is_array guard validates the shape)
     }
 }

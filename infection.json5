@@ -1,0 +1,48 @@
+{
+    $schema: "./vendor/infection/infection/resources/schema.json",
+    source: {
+        directories: [
+            "src"
+        ]
+    },
+    logs: {
+        summary: "build/infection-summary.log",
+        text: "build/infection.log"
+    },
+    phpUnit: {
+        configDir: ".",
+        customPath: "vendor/bin/phpunit"
+    },
+    timeout: 15,
+    mutators: {
+        "@default": true,
+        // Equivalent mutant. The atomic-write temp path is an implementation
+        // detail: whether the staging file is "<cache>.tmp", the cache path
+        // itself, or ".tmp", the final rename leaves an identical cache file
+        // behind, so no single-threaded test can observe the difference. The
+        // regex scopes the ignore to the temp-path line only, leaving the other
+        // concatenations in cache() fully tested.
+        ConcatOperandRemoval: {
+            ignoreSourceCodeByRegex: [
+                ".*\\$tempPath .*"
+            ]
+        },
+        // Equivalent mutant. Removing the first throw is masked by the second
+        // throw that guards the subsequent rename failure: with no staging file
+        // written, the rename always fails and raises an identical
+        // RuntimeException, so the observable behaviour is unchanged.
+        Throw_: {
+            ignore: [
+                "SineMacula\\Laravel\\Modules\\Configuration\\Modules::cache"
+            ]
+        },
+        // Equivalent mutant. Every ModulePath value is relative, so there is
+        // never a leading separator for ltrim to strip; the call is defensive
+        // and a no-op for all reachable inputs.
+        UnwrapLtrim: {
+            ignore: [
+                "SineMacula\\Laravel\\Modules\\Configuration\\Modules::resolvePaths"
+            ]
+        }
+    }
+}

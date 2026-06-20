@@ -141,9 +141,9 @@ class ModulePathTest extends TestCase
      */
     public function testTryFromReturnsNullForInvalidValue(): void
     {
-        $result = ModulePath::tryFrom('nonexistent');
+        $case = ModulePath::tryFrom('nonexistent');
 
-        static::assertNull($result);
+        static::assertNull($case);
     }
 
     /**
@@ -153,8 +153,8 @@ class ModulePathTest extends TestCase
      */
     public function testFromReturnsCorrectCase(): void
     {
-        $result = ModulePath::from('modules');
+        $case = ModulePath::from('modules');
 
-        static::assertSame(ModulePath::MODULES, $result);
+        static::assertSame(ModulePath::MODULES, $case);
     }
 }

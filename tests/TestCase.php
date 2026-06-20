@@ -21,14 +21,12 @@ abstract class TestCase extends BaseTestCase
     /**
      * Get the package providers.
      *
-     * phpcs:disable Squiz.Commenting.FunctionComment.TypeHintMissing
-     *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  mixed  $app
      * @return list<class-string<\Illuminate\Support\ServiceProvider>>
      */
-    protected function getPackageProviders(#[\SensitiveParameter] $app): array
+    #[\Override]
+    protected function getPackageProviders(mixed $app): array
     {
-        // phpcs:enable
         return [
             ModuleServiceProvider::class,
         ];

@@ -77,9 +77,9 @@ class ApplicationBuilderTest extends TestCase
         $app     = new Application($this->tempDir);
         $builder = new ApplicationBuilder($app);
 
-        $result = $builder->withModules();
+        $returned = $builder->withModules();
 
-        static::assertSame($builder, $result);
+        static::assertSame($builder, $returned);
     }
 
     /**
@@ -252,6 +252,47 @@ class ApplicationBuilderTest extends TestCase
         );
 
         static::assertCount(2, $builder->capturedCommands);
+    }
+
+    /**
+     * Test that withModules passes zero-indexed list arrays (not module-keyed
+     * maps) to withEvents and withCommands, spreading every module's paths.
+     *
+     * @return void
+     */
+    public function testWithModulesPassesListShapedPathsForMultipleModules(): void
+    {
+        foreach (['alpha', 'beta'] as $module) {
+
+            $console = $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . $module
+                . DIRECTORY_SEPARATOR . 'Console';
+
+            mkdir($console . DIRECTORY_SEPARATOR . 'Commands', 0755, true);
+            touch($console . DIRECTORY_SEPARATOR . 'schedule.php');
+            mkdir(
+                $this->tempDir
+                    . DIRECTORY_SEPARATOR . 'modules'
+                    . DIRECTORY_SEPARATOR . $module
+                    . DIRECTORY_SEPARATOR . 'Listeners',
+                0755,
+                true,
+            );
+        }
+
+        $app     = new Application($this->tempDir);
+        $builder = $this->createSpyBuilder($app);
+
+        $builder->withModules();
+
+        // Both modules contribute a Listeners directory.
+        static::assertCount(2, $builder->capturedEvents);
+        static::assertTrue(array_is_list($builder->capturedEvents));
+
+        // Both modules contribute a schedule file and a Commands directory.
+        static::assertCount(4, $builder->capturedCommands);
+        static::assertTrue(array_is_list($builder->capturedCommands));
     }
 
     /**

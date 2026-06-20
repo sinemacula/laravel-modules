@@ -25,9 +25,11 @@
         "brianium/paratest": "^7.20",
         "doctrine/coding-standard": "^14.0",
         "friendsofphp/php-cs-fixer": "^3.94",
+        "infection/infection": "^0.33.3",
         "larastan/larastan": "^3.9",
         "mockery/mockery": "^1.6",
         "orchestra/testbench": "^11.0",
+        "phpbench/phpbench": "^1.7",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpdoc-parser": "^2.3",
         "phpstan/phpstan": "^2.1",
@@ -49,6 +51,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Benchmarks\\": "benchmarks/",
             "Tests\\": "tests/"
         }
     },
@@ -59,25 +62,43 @@
         "format": [
             "qlty fmt"
         ],
-        "test": [
-            "@php vendor/bin/paratest $@"
+        "smells": [
+            "qlty smells"
         ],
-        "test-coverage": [
+        "test": [
+            "@php vendor/bin/paratest"
+        ],
+        "test:coverage": [
             "@php vendor/bin/paratest --coverage-clover=clover.xml"
+        ],
+        "test:mutation": [
+            "@php vendor/bin/infection --configuration=infection.json5 --only-covering-test-cases --min-msi=90 --min-covered-msi=90"
+        ],
+        "test:mutation:full": [
+            "@php vendor/bin/infection --configuration=infection.full.json5 --only-covering-test-cases"
+        ],
+        "bench": [
+            "@php vendor/bin/phpbench run benchmarks --config=phpbench.json --progress=plain --report=aggregate"
+        ],
+        "bench:ci": [
+            "@php -r \"is_dir('build') || mkdir('build', 0777, true);\"",
+            "@php vendor/bin/phpbench run benchmarks --config=phpbench.json --progress=plain --report=aggregate --dump-file=build/phpbench.xml"
+        ],
+        "bench:smoke": [
+            "@php vendor/bin/phpbench run benchmarks --config=phpbench.json --progress=plain --iterations=1 --revs=1"
         ]
     },
     "scripts-descriptions": {
         "check": "Run static analysis and lint checks via qlty.",
         "format": "Format codebase using qlty.",
-        "test": "Run the default PHPUnit test suites in parallel using Paratest.",
-        "test-coverage": "Shortcut to run Paratest coverage for default suites."
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "SineMacula\\Laravel\\Modules\\Providers\\ModuleServiceProvider"
-            ]
-        }
+        "smells": "Report code smells (duplication, complexity) via qlty.",
+        "test": "Run the PHPUnit test suite in parallel using Paratest.",
+        "test:coverage": "Run the PHPUnit test suite with clover coverage report.",
+        "test:mutation": "Run the Infection mutation-testing gate against the MSI thresholds.",
+        "test:mutation:full": "Run the full Infection mutation suite without MSI thresholds.",
+        "bench": "Run PHPBench benchmarks for the module discovery and path resolution hot paths.",
+        "bench:ci": "Run PHPBench benchmarks and dump CI output for artifact upload.",
+        "bench:smoke": "Run a single-rev benchmark pass to verify every subject executes."
     },
     "config": {
         "optimize-autoloader": true,
@@ -85,9 +106,17 @@
         "sort-packages": true,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
+            "infection/extension-installer": true,
             "phpstan/extension-installer": true
         }
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SineMacula\\Laravel\\Modules\\Providers\\ModuleServiceProvider"
+            ]
+        }
+    }
 }

@@ -3,7 +3,6 @@
 namespace Tests\Feature\Console\Commands;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use SineMacula\Laravel\Modules\Configuration\Modules;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleCacheCommand;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleClearCommand;
 use Tests\Support\Concerns\InteractsWithModules;
@@ -78,7 +77,7 @@ class ModuleCacheCommandTest extends TestCase
     public function testCacheCommandExitsSuccessfully(): void
     {
         $this->artisan('module:cache')
-            ->assertExitCode(0); // @phpstan-ignore method.nonObject
+            ->assertExitCode(0); // @phpstan-ignore method.nonObject (untyped pending-command API)
     }
 
     /**
@@ -89,7 +88,7 @@ class ModuleCacheCommandTest extends TestCase
     public function testCacheCommandOutputsSuccessMessage(): void
     {
         $this->artisan('module:cache')
-            ->expectsOutputToContain('Modules cached successfully'); // @phpstan-ignore method.nonObject
+            ->expectsOutputToContain('Modules cached successfully'); // @phpstan-ignore method.nonObject (untyped pending-command API)
     }
 
     /**
@@ -118,7 +117,7 @@ class ModuleCacheCommandTest extends TestCase
     {
         $this->artisan('module:cache');
         $this->artisan('module:clear')
-            ->assertExitCode(0); // @phpstan-ignore method.nonObject
+            ->assertExitCode(0); // @phpstan-ignore method.nonObject (untyped pending-command API)
     }
 
     /**
@@ -129,7 +128,7 @@ class ModuleCacheCommandTest extends TestCase
     public function testClearCommandOutputsSuccessMessage(): void
     {
         $this->artisan('module:clear')
-            ->expectsOutputToContain('Cached modules cleared successfully'); // @phpstan-ignore method.nonObject
+            ->expectsOutputToContain('Cached modules cleared successfully'); // @phpstan-ignore method.nonObject (untyped pending-command API)
     }
 
     /**
@@ -156,6 +155,6 @@ class ModuleCacheCommandTest extends TestCase
         static::assertFileDoesNotExist($this->cachePath);
 
         $this->artisan('module:clear')
-            ->assertExitCode(0); // @phpstan-ignore method.nonObject
+            ->assertExitCode(0); // @phpstan-ignore method.nonObject (untyped pending-command API)
     }
 }

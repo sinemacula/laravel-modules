@@ -6,6 +6,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use SineMacula\Laravel\Modules\Configuration\Modules;
+use SineMacula\Laravel\Modules\Exceptions\ModuleException;
 use Tests\Support\Concerns\InteractsWithModules;
 use Tests\Support\Concerns\ManagesTemporaryFiles;
 
@@ -92,7 +93,7 @@ class ModulesTest extends TestCase
     }
 
     /**
-     * Test that modulesPath throws a RuntimeException when the base path has
+     * Test that modulesPath throws a ModuleException when the base path has
      * not been set.
      *
      * @return void
@@ -100,7 +101,7 @@ class ModulesTest extends TestCase
     #[RunInSeparateProcess]
     public function testModulesPathThrowsWhenBasePathNotSet(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(ModuleException::class);
         $this->expectExceptionMessage('No base path has been set.');
 
         Modules::modulesPath();
@@ -125,48 +126,30 @@ class ModulesTest extends TestCase
 
         static::assertFileExists($cachePath);
 
-        $result = require $cachePath;
+        $modules = require $cachePath;
 
-        static::assertIsArray($result);
-        static::assertArrayHasKey('alpha', $result);
-        static::assertArrayHasKey('beta', $result);
+        static::assertIsArray($modules);
+        static::assertArrayHasKey('alpha', $modules);
+        static::assertArrayHasKey('beta', $modules);
     }
 
     /**
-     * Test that cache throws a RuntimeException when the cache file cannot be
+     * Test that cache throws a ModuleException when the cache file cannot be
      * written.
      *
      * @return void
      */
     public function testCacheThrowsOnWriteFailure(): void
     {
-        $nonWritable = $this->tempDir
-            . DIRECTORY_SEPARATOR . 'readonly';
+        $cacheDir  = $this->createReadOnlyCacheDirectory();
+        $cachePath = $cacheDir . DIRECTORY_SEPARATOR . 'modules.php';
 
-        mkdir($nonWritable . DIRECTORY_SEPARATOR . 'modules', 0755, true);
-        mkdir(
-            $nonWritable
-                . DIRECTORY_SEPARATOR . 'bootstrap'
-                . DIRECTORY_SEPARATOR . 'cache',
-            0755,
-            true,
-        );
+        Modules::setBasePath(dirname($cacheDir, 2));
 
-        // Make the cache directory non-writable
-        chmod(
-            $nonWritable
-                . DIRECTORY_SEPARATOR . 'bootstrap'
-                . DIRECTORY_SEPARATOR . 'cache',
-            0444,
-        );
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage('Failed to write cache file at ' . $cachePath . '.');
 
-        Modules::setBasePath($nonWritable);
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Failed to write cache file at');
-
-        // Suppress the PHP warning from file_put_contents so
-        // PHPUnit only sees the RuntimeException
+        // Suppress the file_put_contents warning so PHPUnit sees only the exception.
         set_error_handler(static fn (): bool => true);
 
         try {
@@ -174,13 +157,8 @@ class ModulesTest extends TestCase
         } finally {
             restore_error_handler();
 
-            // Restore permissions so tearDown can clean up
-            chmod(
-                $nonWritable
-                    . DIRECTORY_SEPARATOR . 'bootstrap'
-                    . DIRECTORY_SEPARATOR . 'cache',
-                0755,
-            );
+            // Restore permissions so tearDown can clean up.
+            chmod($cacheDir, 0755);
         }
     }
 
@@ -204,10 +182,10 @@ class ModulesTest extends TestCase
             . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'modules.php';
 
-        $result = require $cachePath;
+        $modules = require $cachePath;
 
-        static::assertArrayHasKey('alpha', $result);
-        static::assertArrayHasKey('beta', $result);
+        static::assertArrayHasKey('alpha', $modules);
+        static::assertArrayHasKey('beta', $modules);
     }
 
     /**
@@ -296,7 +274,7 @@ class ModulesTest extends TestCase
     {
         Modules::setBasePath($this->tempDir);
 
-        $result = Modules::resourcePath('alpha::some/path');
+        $path = Modules::resourcePath('alpha::some/path');
 
         $expected = realpath(
             $this->tempDir
@@ -305,7 +283,7 @@ class ModulesTest extends TestCase
                 . DIRECTORY_SEPARATOR . 'Resources',
         );
 
-        static::assertSame($expected, $result);
+        static::assertSame($expected, $path);
     }
 
     /**
@@ -337,9 +315,9 @@ class ModulesTest extends TestCase
 
         // The default module is 'foundation', which does not
         // exist in our temp structure, so should return empty
-        $result = Modules::resourcePath('some/path');
+        $path = Modules::resourcePath('some/path');
 
-        static::assertSame('', $result);
+        static::assertSame('', $path);
     }
 
     /**
@@ -351,9 +329,9 @@ class ModulesTest extends TestCase
     {
         Modules::setBasePath($this->tempDir);
 
-        $result = Modules::resourcePath('nonexistent::path');
+        $path = Modules::resourcePath('nonexistent::path');
 
-        static::assertSame('', $result);
+        static::assertSame('', $path);
     }
 
     /**
@@ -366,14 +344,14 @@ class ModulesTest extends TestCase
     {
         Modules::setBasePath($this->tempDir);
 
-        $result = Modules::resourcePath('::path');
+        $path = Modules::resourcePath('::path');
 
-        static::assertSame('', $result);
+        static::assertSame('', $path);
     }
 
     /**
      * Test that a single colon does not act as the module namespace separator
-     * — only double colon does.
+     * - only double colon does.
      *
      * @return void
      */
@@ -381,9 +359,9 @@ class ModulesTest extends TestCase
     {
         Modules::setBasePath($this->tempDir);
 
-        $result = Modules::resourcePath('alpha:path');
+        $path = Modules::resourcePath('alpha:path');
 
-        static::assertSame('', $result);
+        static::assertSame('', $path);
     }
 
     /**
@@ -403,11 +381,11 @@ class ModulesTest extends TestCase
 
         Modules::setBasePath($this->tempDir);
 
-        $result = Modules::resourcePath('some/path');
+        $path = Modules::resourcePath('some/path');
 
         static::assertSame(
             realpath($foundationResources),
-            $result,
+            $path,
         );
     }
 
@@ -428,11 +406,11 @@ class ModulesTest extends TestCase
 
         Modules::setBasePath($this->tempDir);
 
-        $result = Modules::resourcePath();
+        $path = Modules::resourcePath();
 
         static::assertSame(
             realpath($foundationResources),
-            $result,
+            $path,
         );
     }
 
@@ -560,6 +538,28 @@ class ModulesTest extends TestCase
     }
 
     /**
+     * Test that discoverModules returns an empty array when the modules
+     * directory does not exist, rather than throwing.
+     *
+     * @return void
+     */
+    public function testDiscoverModulesReturnsEmptyWhenModulesDirectoryMissing(): void
+    {
+        $baseWithoutModules = sys_get_temp_dir()
+            . DIRECTORY_SEPARATOR . 'no_modules_' . uniqid();
+
+        mkdir($baseWithoutModules, 0755, true);
+
+        $this->resetModulesState();
+        Modules::setBasePath($baseWithoutModules);
+
+        static::assertSame([], Modules::getModules());
+        static::assertSame([], Modules::routePaths());
+
+        rmdir($baseWithoutModules);
+    }
+
+    /**
      * Test that discoverModules lowercases directory names when using them as
      * module keys.
      *
@@ -623,7 +623,7 @@ class ModulesTest extends TestCase
 
         // The cached_module does not have routes.php, so it
         // should be filtered out, but the key should have been
-        // attempted — confirming cache was used
+        // attempted - confirming cache was used
         $views = Modules::viewPaths();
 
         // Verify that 'alpha' (from discovery) is NOT present,
@@ -669,28 +669,6 @@ class ModulesTest extends TestCase
         // Both should reflect the same discovered modules
         static::assertArrayHasKey('alpha', $routes);
         static::assertArrayHasKey('alpha', $views);
-    }
-
-    /**
-     * Test that flush clears both the modules and resolved paths, forcing
-     * re-resolution on the next call.
-     *
-     * @return void
-     */
-    public function testFlushClearsModulesAndResolvedPaths(): void
-    {
-        Modules::setBasePath($this->tempDir);
-
-        // Populate internal state
-        $viewsBefore = Modules::viewPaths();
-
-        // cache() calls flush() internally
-        Modules::cache();
-
-        // After flush, the next call should re-resolve
-        $viewsAfter = Modules::viewPaths();
-
-        static::assertEquals($viewsBefore, $viewsAfter);
     }
 
     /**
@@ -860,13 +838,171 @@ class ModulesTest extends TestCase
     }
 
     /**
+     * Test that cache flushes the in-memory state so a read taken after caching
+     * reflects modules added since the state was first primed.
+     *
+     * @return void
+     */
+    public function testCacheFlushesInMemoryState(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        // Prime the in-memory module and resolved-path state.
+        Modules::viewPaths();
+
+        // Add a new module after the state has been primed.
+        mkdir(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'epsilon'
+                . DIRECTORY_SEPARATOR . 'Resources'
+                . DIRECTORY_SEPARATOR . 'views',
+            0755,
+            true,
+        );
+
+        // cache() must flush the primed state before writing fresh discovery,
+        // so the subsequent read reflects epsilon.
+        Modules::cache();
+
+        static::assertArrayHasKey('epsilon', Modules::viewPaths());
+    }
+
+    /**
+     * Test that getModules memoizes its result so modules added after the first
+     * resolution are not picked up without a flush.
+     *
+     * @return void
+     */
+    public function testGetModulesMemoizesResult(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        $first = Modules::getModules();
+
+        // Add a module after the first resolution has been memoized.
+        mkdir(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'zeta',
+            0755,
+            true,
+        );
+
+        $second = Modules::getModules();
+
+        static::assertSame($first, $second);
+        static::assertArrayNotHasKey('zeta', $second);
+    }
+
+    /**
+     * Test that resourcePath treats only the first :: as the module boundary,
+     * so additional separators do not change which module resolves.
+     *
+     * @return void
+     */
+    public function testResourcePathUsesOnlyFirstSeparatorAsModuleBoundary(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        $path = Modules::resourcePath('alpha::nested::asset');
+
+        $expected = realpath(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'alpha'
+                . DIRECTORY_SEPARATOR . 'Resources',
+        );
+
+        static::assertSame($expected, $path);
+    }
+
+    /**
+     * Test that an empty module prefix (a leading ::) falls back to the default
+     * module rather than resolving an empty module name.
+     *
+     * @return void
+     */
+    public function testResourcePathWithEmptyModulePrefixFallsBackToDefaultModule(): void
+    {
+        mkdir(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'foundation'
+                . DIRECTORY_SEPARATOR . 'Resources',
+            0755,
+            true,
+        );
+
+        Modules::setBasePath($this->tempDir);
+
+        $path = Modules::resourcePath('::views');
+
+        $expected = realpath(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'foundation'
+                . DIRECTORY_SEPARATOR . 'Resources',
+        );
+
+        static::assertSame($expected, $path);
+    }
+
+    /**
+     * Test that resolved paths are memoized, so a target sub-path created after
+     * the first resolution does not retroactively appear.
+     *
+     * @return void
+     */
+    public function testResolvePathsCachesAcrossSubPathCreation(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        // Beta exists but has no views directory, so it is filtered out.
+        static::assertArrayNotHasKey('beta', Modules::viewPaths());
+
+        // Create beta's views directory after the paths have been resolved.
+        mkdir(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'beta'
+                . DIRECTORY_SEPARATOR . 'Resources'
+                . DIRECTORY_SEPARATOR . 'views',
+            0755,
+            true,
+        );
+
+        // The resolved paths are memoized, so beta must remain absent.
+        static::assertArrayNotHasKey('beta', Modules::viewPaths());
+    }
+
+    /**
+     * Create a non-writable bootstrap/cache directory and return its path.
+     *
+     * @return string
+     */
+    private function createReadOnlyCacheDirectory(): string
+    {
+        $base     = $this->tempDir . DIRECTORY_SEPARATOR . 'readonly';
+        $cacheDir = $base
+            . DIRECTORY_SEPARATOR . 'bootstrap'
+            . DIRECTORY_SEPARATOR . 'cache';
+
+        mkdir($base . DIRECTORY_SEPARATOR . 'modules', 0755, true);
+        mkdir($cacheDir, 0755, true);
+        chmod($cacheDir, 0444);
+
+        return $cacheDir;
+    }
+
+    /**
      * Create the temporary directory structure for testing.
      *
      * @return void
      */
     private function createDirectoryStructure(): void
     {
-        // Alpha module — fully populated
+        // Alpha module - fully populated
         $this->createDirectory('modules/alpha/Resources/views');
         $this->createDirectory('modules/alpha/Resources/lang');
         $this->createDirectory('modules/alpha/Http');
@@ -876,11 +1012,11 @@ class ModulesTest extends TestCase
         $this->createFile('modules/alpha/Http/routes.php');
         $this->createFile('modules/alpha/Console/schedule.php');
 
-        // Beta module — minimal, no routes/views/lang
+        // Beta module - minimal, no routes/views/lang
         $this->createDirectory('modules/beta/Resources');
         $this->createDirectory('modules/beta/Http');
 
-        // Dot directory — should be skipped
+        // Dot directory - should be skipped
         $this->createDirectory('modules/.hidden');
 
         // Bootstrap cache directory

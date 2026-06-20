@@ -34,7 +34,8 @@ class SpyApplicationBuilder extends ApplicationBuilder
      *
      * @return static
      */
-    public function withKernels(): static // @phpstan-ignore method.childReturnType (untyped parent)
+    #[\Override]
+    public function withKernels(): static
     {
         $this->withKernelsCalled = true;
 
@@ -47,7 +48,8 @@ class SpyApplicationBuilder extends ApplicationBuilder
      * @param  bool|iterable<string>  $discover
      * @return static
      */
-    public function withEvents(bool|iterable $discover = true): static // @phpstan-ignore method.childReturnType (untyped parent)
+    #[\Override]
+    public function withEvents(bool|iterable $discover = true): static
     {
         if (is_iterable($discover)) {
             $this->capturedEvents = [...$discover];
@@ -62,7 +64,8 @@ class SpyApplicationBuilder extends ApplicationBuilder
      * @param  array<int, string>  $commands
      * @return static
      */
-    public function withCommands(array $commands = []): static // @phpstan-ignore method.childReturnType, method.childParameterType (untyped parent)
+    #[\Override]
+    public function withCommands(array $commands = []): static
     {
         $this->capturedCommands = $commands;
 
@@ -76,7 +79,8 @@ class SpyApplicationBuilder extends ApplicationBuilder
      * @param  bool  $bootstrap
      * @return static
      */
-    public function withProviders(array $providers = [], bool $bootstrap = true): static // @phpstan-ignore method.childReturnType, method.childParameterType (untyped parent)
+    #[\Override]
+    public function withProviders(array $providers = [], bool $bootstrap = true): static
     {
         $this->withProvidersCalled = true;
 

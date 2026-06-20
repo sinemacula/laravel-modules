@@ -27,13 +27,13 @@ class Modules
     private const string DEFAULT_MODULE = 'foundation';
 
     /** @var string The base path to the root application directory. */
-    private static string $basePath;
+    private static string $basePath; // @phpstan-ignore sineMacula.mutableStaticProperty (intentional static state for the module facade)
 
     /** @var array<string, string>|null The discovered module paths keyed by module name. */
-    private static ?array $modules = null;
+    private static ?array $modules = null; // @phpstan-ignore sineMacula.mutableStaticProperty (intentional static state for the module facade)
 
     /** @var array<string, array<string, string>> Resolved paths keyed by path type. */
-    private static array $resolvedPaths = [];
+    private static array $resolvedPaths = []; // @phpstan-ignore sineMacula.mutableStaticProperty (intentional static state for the module facade)
 
     /**
      * Set the base path for the module resolver.

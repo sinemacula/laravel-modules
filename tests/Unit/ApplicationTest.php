@@ -31,6 +31,7 @@ class ApplicationTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -47,6 +48,7 @@ class ApplicationTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function tearDown(): void
     {
         $this->removeTempDirectory();

@@ -28,10 +28,10 @@ final class ModuleTree
     ];
 
     /** @var \ReflectionProperty|null Cached handle to the Modules::$modules property. */
-    private static ?\ReflectionProperty $modulesProperty = null;
+    private static ?\ReflectionProperty $modulesProperty = null; // @phpstan-ignore sineMacula.mutableStaticProperty (cached reflection handle for state resets)
 
     /** @var \ReflectionProperty|null Cached handle to the Modules::$resolvedPaths property. */
-    private static ?\ReflectionProperty $resolvedPathsProperty = null;
+    private static ?\ReflectionProperty $resolvedPathsProperty = null; // @phpstan-ignore sineMacula.mutableStaticProperty (cached reflection handle for state resets)
 
     /** @var string The root path of the temporary application. */
     private readonly string $basePath;

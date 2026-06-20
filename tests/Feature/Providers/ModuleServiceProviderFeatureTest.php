@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Feature\Providers;
 
 use Illuminate\Support\Facades\Artisan;
@@ -21,7 +23,7 @@ use Tests\TestCase;
  * @internal
  */
 #[CoversClass(ModuleServiceProvider::class)]
-class ModuleServiceProviderFeatureTest extends TestCase
+final class ModuleServiceProviderFeatureTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -78,12 +80,12 @@ class ModuleServiceProviderFeatureTest extends TestCase
      */
     public function testModuleCacheCommandInOptimizeList(): void
     {
-        static::assertArrayHasKey(
+        self::assertArrayHasKey(
             'modules',
             ServiceProvider::$optimizeCommands,
         );
 
-        static::assertSame(
+        self::assertSame(
             'module:cache',
             ServiceProvider::$optimizeCommands['modules'],
         );
@@ -121,9 +123,9 @@ class ModuleServiceProviderFeatureTest extends TestCase
     {
         $commands = array_keys(Artisan::all());
 
-        static::assertContains('module:cache', $commands);
-        static::assertContains('module:clear', $commands);
-        static::assertContains('module:list', $commands);
-        static::assertContains('module:make', $commands);
+        self::assertContains('module:cache', $commands);
+        self::assertContains('module:clear', $commands);
+        self::assertContains('module:list', $commands);
+        self::assertContains('module:make', $commands);
     }
 }

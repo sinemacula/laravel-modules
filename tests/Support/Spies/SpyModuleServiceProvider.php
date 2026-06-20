@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Support\Spies;
 
 use SineMacula\Laravel\Modules\Providers\ModuleServiceProvider;
@@ -15,7 +17,7 @@ use SineMacula\Laravel\Modules\Providers\ModuleServiceProvider;
  *
  * @phpstan-ignore class.childType (test double subclasses the service provider to record protected calls)
  */
-class SpyModuleServiceProvider extends ModuleServiceProvider
+final class SpyModuleServiceProvider extends ModuleServiceProvider
 {
     /** @var list<array{mixed, mixed}> */
     public array $loadViewsFromCalls = [];

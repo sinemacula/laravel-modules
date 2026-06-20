@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -22,7 +24,7 @@ use Tests\Support\Concerns\ManagesTemporaryFiles;
  * @internal
  */
 #[CoversClass(Application::class)]
-class ApplicationTest extends TestCase
+final class ApplicationTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -66,7 +68,7 @@ class ApplicationTest extends TestCase
     {
         $builder = Application::configure($this->tempDir);
 
-        static::assertInstanceOf(ApplicationBuilder::class, $builder);
+        self::assertInstanceOf(ApplicationBuilder::class, $builder);
     }
 
     /**
@@ -80,7 +82,7 @@ class ApplicationTest extends TestCase
 
         $app = $this->extractAppFromBuilder($builder);
 
-        static::assertSame($this->tempDir, $app->basePath());
+        self::assertSame($this->tempDir, $app->basePath());
     }
 
     /**
@@ -96,7 +98,7 @@ class ApplicationTest extends TestCase
 
         // The inferred base path must resolve to a real directory (the project
         // root from which the test suite runs), not merely a non-empty string.
-        static::assertDirectoryExists($app->basePath());
+        self::assertDirectoryExists($app->basePath());
     }
 
     /**
@@ -115,7 +117,7 @@ class ApplicationTest extends TestCase
             $this->tempDir . '/modules/foundation/Resources',
         );
 
-        static::assertSame($resourcesRealPath, $path);
+        self::assertSame($resourcesRealPath, $path);
     }
 
     /**
@@ -141,7 +143,7 @@ class ApplicationTest extends TestCase
 
         $path = $app->resourcePath();
 
-        static::assertSame(
+        self::assertSame(
             $emptyDir . DIRECTORY_SEPARATOR . 'resources',
             $path,
         );
@@ -165,7 +167,7 @@ class ApplicationTest extends TestCase
 
         $path = $app->resourcePath('views');
 
-        static::assertSame(
+        self::assertSame(
             $resourcesRealPath . DIRECTORY_SEPARATOR . 'views',
             $path,
         );
@@ -187,11 +189,11 @@ class ApplicationTest extends TestCase
 
         $path = $app->resourcePath('foundation::views');
 
-        static::assertSame(
+        self::assertSame(
             $resourcesRealPath . DIRECTORY_SEPARATOR . 'views',
             $path,
         );
-        static::assertStringNotContainsString('::', $path);
+        self::assertStringNotContainsString('::', $path);
     }
 
     /**
@@ -210,7 +212,7 @@ class ApplicationTest extends TestCase
 
         $path = $app->resourcePath('foundation::nested::asset');
 
-        static::assertSame(
+        self::assertSame(
             $resourcesRealPath . DIRECTORY_SEPARATOR . 'nested::asset',
             $path,
         );
@@ -227,7 +229,7 @@ class ApplicationTest extends TestCase
 
         $path = $app->path();
 
-        static::assertSame(
+        self::assertSame(
             $this->tempDir . DIRECTORY_SEPARATOR . 'modules',
             $path,
         );
@@ -244,7 +246,7 @@ class ApplicationTest extends TestCase
 
         $path = $app->path('Models');
 
-        static::assertSame(
+        self::assertSame(
             $this->tempDir
                 . DIRECTORY_SEPARATOR . 'modules'
                 . DIRECTORY_SEPARATOR . 'Models',
@@ -270,7 +272,7 @@ class ApplicationTest extends TestCase
 
         $path = $app->path('Services');
 
-        static::assertSame(
+        self::assertSame(
             $customAppPath . DIRECTORY_SEPARATOR . 'Services',
             $path,
         );

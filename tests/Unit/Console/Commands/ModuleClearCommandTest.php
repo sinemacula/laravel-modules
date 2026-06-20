@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit\Console\Commands;
 
 use Illuminate\Foundation\Application;
@@ -21,7 +23,7 @@ use Tests\Support\Concerns\ManagesTemporaryFiles;
  * @internal
  */
 #[CoversClass(ModuleClearCommand::class)]
-class ModuleClearCommandTest extends TestCase
+final class ModuleClearCommandTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -70,7 +72,7 @@ class ModuleClearCommandTest extends TestCase
             . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'modules.php';
 
-        static::assertFileExists($cachePath);
+        self::assertFileExists($cachePath);
 
         $app = new Application($this->tempDir);
 
@@ -79,6 +81,6 @@ class ModuleClearCommandTest extends TestCase
 
         $command->run(new ArrayInput([]), new BufferedOutput);
 
-        static::assertFileDoesNotExist($cachePath);
+        self::assertFileDoesNotExist($cachePath);
     }
 }

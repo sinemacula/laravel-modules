@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Support\Spies;
 
 use SineMacula\Laravel\Modules\Configuration\ApplicationBuilder;
@@ -15,7 +17,7 @@ use SineMacula\Laravel\Modules\Configuration\ApplicationBuilder;
  *
  * @phpstan-ignore class.childType (test double subclasses the application builder to capture registration calls)
  */
-class SpyApplicationBuilder extends ApplicationBuilder
+final class SpyApplicationBuilder extends ApplicationBuilder
 {
     /** @var array<int, string> Captured event discovery paths. */
     public array $capturedEvents = [];

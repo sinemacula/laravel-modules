@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Benchmarks\Support;
 
 use Illuminate\Filesystem\Filesystem;
@@ -107,7 +109,7 @@ final class ModuleTree
      */
     private function build(int $moduleCount): void
     {
-        // The foundation module is the default used by resourcePath() resolution.
+        // The foundation module is the default for resourcePath() resolution.
         $this->createModule('foundation');
 
         for ($index = 0; $index < $moduleCount; $index++) {
@@ -147,9 +149,11 @@ final class ModuleTree
     {
         $path = $this->basePath . DIRECTORY_SEPARATOR . $relativePath;
 
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
+        if (is_dir($path)) {
+            return;
         }
+
+        mkdir($path, 0755, true);
     }
 
     /**

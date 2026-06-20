@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit\Configuration;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,7 +26,7 @@ use Tests\Support\Concerns\ManagesTemporaryFiles;
  * @internal
  */
 #[CoversClass(Modules::class)]
-class ModulesTest extends TestCase
+final class ModulesTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -75,7 +77,7 @@ class ModulesTest extends TestCase
         $expected = $this->tempDir
             . DIRECTORY_SEPARATOR . 'modules';
 
-        static::assertSame($expected, Modules::modulesPath());
+        self::assertSame($expected, Modules::modulesPath());
     }
 
     /**
@@ -88,7 +90,7 @@ class ModulesTest extends TestCase
     {
         Modules::setBasePath('/app');
 
-        static::assertSame(
+        self::assertSame(
             '/app' . DIRECTORY_SEPARATOR . 'modules',
             Modules::modulesPath(),
         );
@@ -126,13 +128,13 @@ class ModulesTest extends TestCase
             . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'modules.php';
 
-        static::assertFileExists($cachePath);
+        self::assertFileExists($cachePath);
 
         $modules = require $cachePath;
 
-        static::assertIsArray($modules);
-        static::assertArrayHasKey('alpha', $modules);
-        static::assertArrayHasKey('beta', $modules);
+        self::assertIsArray($modules);
+        self::assertArrayHasKey('alpha', $modules);
+        self::assertArrayHasKey('beta', $modules);
     }
 
     /**
@@ -151,7 +153,7 @@ class ModulesTest extends TestCase
         $this->expectException(ModuleException::class);
         $this->expectExceptionMessage('Failed to write cache file at ' . $cachePath . '.');
 
-        // Suppress the file_put_contents warning so PHPUnit sees only the exception.
+        // Suppress the file_put_contents warning so PHPUnit sees the exception.
         set_error_handler(static fn (): bool => true);
 
         try {
@@ -186,8 +188,8 @@ class ModulesTest extends TestCase
 
         $modules = require $cachePath;
 
-        static::assertArrayHasKey('alpha', $modules);
-        static::assertArrayHasKey('beta', $modules);
+        self::assertArrayHasKey('alpha', $modules);
+        self::assertArrayHasKey('beta', $modules);
     }
 
     /**
@@ -206,11 +208,11 @@ class ModulesTest extends TestCase
 
         file_put_contents($cachePath, '<?php return [];');
 
-        static::assertFileExists($cachePath);
+        self::assertFileExists($cachePath);
 
         Modules::clearCache();
 
-        static::assertFileDoesNotExist($cachePath);
+        self::assertFileDoesNotExist($cachePath);
     }
 
     /**
@@ -241,7 +243,7 @@ class ModulesTest extends TestCase
         // After clearing, fresh discovery should find delta
         $viewsAfter = Modules::viewPaths();
 
-        static::assertArrayHasKey('delta', $viewsAfter);
+        self::assertArrayHasKey('delta', $viewsAfter);
     }
 
     /**
@@ -258,12 +260,12 @@ class ModulesTest extends TestCase
             . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'modules.php';
 
-        static::assertFileDoesNotExist($cachePath);
+        self::assertFileDoesNotExist($cachePath);
 
         // Should not throw
         Modules::clearCache();
 
-        static::assertFileDoesNotExist($cachePath);
+        self::assertFileDoesNotExist($cachePath);
     }
 
     /**
@@ -285,7 +287,7 @@ class ModulesTest extends TestCase
                 . DIRECTORY_SEPARATOR . 'Resources',
         );
 
-        static::assertSame($expected, $path);
+        self::assertSame($expected, $path);
     }
 
     /**
@@ -301,8 +303,8 @@ class ModulesTest extends TestCase
         $lower = Modules::resourcePath('alpha::some/path');
         $upper = Modules::resourcePath('ALPHA::some/path');
 
-        static::assertSame($lower, $upper);
-        static::assertNotSame('', $lower);
+        self::assertSame($lower, $upper);
+        self::assertNotSame('', $lower);
     }
 
     /**
@@ -319,7 +321,7 @@ class ModulesTest extends TestCase
         // exist in our temp structure, so should return empty
         $path = Modules::resourcePath('some/path');
 
-        static::assertSame('', $path);
+        self::assertSame('', $path);
     }
 
     /**
@@ -333,7 +335,7 @@ class ModulesTest extends TestCase
 
         $path = Modules::resourcePath('nonexistent::path');
 
-        static::assertSame('', $path);
+        self::assertSame('', $path);
     }
 
     /**
@@ -348,7 +350,7 @@ class ModulesTest extends TestCase
 
         $path = Modules::resourcePath('::path');
 
-        static::assertSame('', $path);
+        self::assertSame('', $path);
     }
 
     /**
@@ -363,7 +365,7 @@ class ModulesTest extends TestCase
 
         $path = Modules::resourcePath('alpha:path');
 
-        static::assertSame('', $path);
+        self::assertSame('', $path);
     }
 
     /**
@@ -385,7 +387,7 @@ class ModulesTest extends TestCase
 
         $path = Modules::resourcePath('some/path');
 
-        static::assertSame(
+        self::assertSame(
             realpath($foundationResources),
             $path,
         );
@@ -410,7 +412,7 @@ class ModulesTest extends TestCase
 
         $path = Modules::resourcePath();
 
-        static::assertSame(
+        self::assertSame(
             realpath($foundationResources),
             $path,
         );
@@ -428,9 +430,9 @@ class ModulesTest extends TestCase
 
         $routes = Modules::routePaths();
 
-        static::assertArrayHasKey('alpha', $routes);
-        static::assertArrayNotHasKey('beta', $routes);
-        static::assertStringContainsString('routes.php', $routes['alpha']);
+        self::assertArrayHasKey('alpha', $routes);
+        self::assertArrayNotHasKey('beta', $routes);
+        self::assertStringContainsString('routes.php', $routes['alpha']);
     }
 
     /**
@@ -445,9 +447,9 @@ class ModulesTest extends TestCase
 
         $views = Modules::viewPaths();
 
-        static::assertArrayHasKey('alpha', $views);
-        static::assertArrayNotHasKey('beta', $views);
-        static::assertStringContainsString('views', $views['alpha']);
+        self::assertArrayHasKey('alpha', $views);
+        self::assertArrayNotHasKey('beta', $views);
+        self::assertStringContainsString('views', $views['alpha']);
     }
 
     /**
@@ -462,9 +464,9 @@ class ModulesTest extends TestCase
 
         $langs = Modules::langPaths();
 
-        static::assertArrayHasKey('alpha', $langs);
-        static::assertArrayNotHasKey('beta', $langs);
-        static::assertStringContainsString('lang', $langs['alpha']);
+        self::assertArrayHasKey('alpha', $langs);
+        self::assertArrayNotHasKey('beta', $langs);
+        self::assertStringContainsString('lang', $langs['alpha']);
     }
 
     /**
@@ -480,7 +482,7 @@ class ModulesTest extends TestCase
         $first  = Modules::viewPaths();
         $second = Modules::viewPaths();
 
-        static::assertSame($first, $second);
+        self::assertSame($first, $second);
     }
 
     /**
@@ -496,8 +498,8 @@ class ModulesTest extends TestCase
         $views = Modules::viewPaths();
 
         // Beta has no views directory
-        static::assertArrayNotHasKey('beta', $views);
-        static::assertCount(1, $views);
+        self::assertArrayNotHasKey('beta', $views);
+        self::assertCount(1, $views);
     }
 
     /**
@@ -520,8 +522,8 @@ class ModulesTest extends TestCase
 
         $routes = Modules::routePaths();
 
-        static::assertArrayNotHasKey('not-a-module.txt', $routes);
-        static::assertArrayHasKey('alpha', $routes);
+        self::assertArrayNotHasKey('not-a-module.txt', $routes);
+        self::assertArrayHasKey('alpha', $routes);
     }
 
     /**
@@ -535,8 +537,8 @@ class ModulesTest extends TestCase
 
         $views = Modules::viewPaths();
 
-        static::assertArrayNotHasKey('.hidden', $views);
-        static::assertArrayNotHasKey('hidden', $views);
+        self::assertArrayNotHasKey('.hidden', $views);
+        self::assertArrayNotHasKey('hidden', $views);
     }
 
     /**
@@ -555,8 +557,8 @@ class ModulesTest extends TestCase
         $this->resetModulesState();
         Modules::setBasePath($baseWithoutModules);
 
-        static::assertSame([], Modules::getModules());
-        static::assertSame([], Modules::routePaths());
+        self::assertSame([], Modules::getModules());
+        self::assertSame([], Modules::routePaths());
 
         rmdir($baseWithoutModules);
     }
@@ -586,8 +588,8 @@ class ModulesTest extends TestCase
 
         $views = Modules::viewPaths();
 
-        static::assertArrayHasKey('gamma', $views);
-        static::assertArrayNotHasKey('Gamma', $views);
+        self::assertArrayHasKey('gamma', $views);
+        self::assertArrayNotHasKey('Gamma', $views);
     }
 
     /**
@@ -620,8 +622,8 @@ class ModulesTest extends TestCase
 
         // The cached_module key should be present instead of
         // alpha/beta from discovery
-        static::assertArrayNotHasKey('alpha', $routes);
-        static::assertArrayNotHasKey('beta', $routes);
+        self::assertArrayNotHasKey('alpha', $routes);
+        self::assertArrayNotHasKey('beta', $routes);
 
         // The cached_module does not have routes.php, so it
         // should be filtered out, but the key should have been
@@ -630,7 +632,7 @@ class ModulesTest extends TestCase
 
         // Verify that 'alpha' (from discovery) is NOT present,
         // confirming cache was used
-        static::assertArrayNotHasKey('alpha', $views);
+        self::assertArrayNotHasKey('alpha', $views);
     }
 
     /**
@@ -648,11 +650,11 @@ class ModulesTest extends TestCase
             . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'modules.php';
 
-        static::assertFileDoesNotExist($cachePath);
+        self::assertFileDoesNotExist($cachePath);
 
         $routes = Modules::routePaths();
 
-        static::assertArrayHasKey('alpha', $routes);
+        self::assertArrayHasKey('alpha', $routes);
     }
 
     /**
@@ -669,8 +671,8 @@ class ModulesTest extends TestCase
         $views  = Modules::viewPaths();
 
         // Both should reflect the same discovered modules
-        static::assertArrayHasKey('alpha', $routes);
-        static::assertArrayHasKey('alpha', $views);
+        self::assertArrayHasKey('alpha', $routes);
+        self::assertArrayHasKey('alpha', $views);
     }
 
     /**
@@ -685,9 +687,9 @@ class ModulesTest extends TestCase
 
         $listeners = Modules::listenerPaths();
 
-        static::assertArrayHasKey('alpha', $listeners);
-        static::assertArrayNotHasKey('beta', $listeners);
-        static::assertStringContainsString('Listeners', $listeners['alpha']);
+        self::assertArrayHasKey('alpha', $listeners);
+        self::assertArrayNotHasKey('beta', $listeners);
+        self::assertStringContainsString('Listeners', $listeners['alpha']);
     }
 
     /**
@@ -702,9 +704,9 @@ class ModulesTest extends TestCase
 
         $commands = Modules::commandPaths();
 
-        static::assertArrayHasKey('alpha', $commands);
-        static::assertArrayNotHasKey('beta', $commands);
-        static::assertStringContainsString('Commands', $commands['alpha']);
+        self::assertArrayHasKey('alpha', $commands);
+        self::assertArrayNotHasKey('beta', $commands);
+        self::assertStringContainsString('Commands', $commands['alpha']);
     }
 
     /**
@@ -719,9 +721,9 @@ class ModulesTest extends TestCase
 
         $schedules = Modules::schedulePaths();
 
-        static::assertArrayHasKey('alpha', $schedules);
-        static::assertArrayNotHasKey('beta', $schedules);
-        static::assertStringContainsString('schedule.php', $schedules['alpha']);
+        self::assertArrayHasKey('alpha', $schedules);
+        self::assertArrayNotHasKey('beta', $schedules);
+        self::assertStringContainsString('schedule.php', $schedules['alpha']);
     }
 
     /**
@@ -735,8 +737,8 @@ class ModulesTest extends TestCase
 
         $path = Modules::getModule('alpha');
 
-        static::assertNotNull($path);
-        static::assertStringContainsString('alpha', $path);
+        self::assertNotNull($path);
+        self::assertStringContainsString('alpha', $path);
     }
 
     /**
@@ -748,7 +750,7 @@ class ModulesTest extends TestCase
     {
         Modules::setBasePath($this->tempDir);
 
-        static::assertNull(Modules::getModule('nonexistent'));
+        self::assertNull(Modules::getModule('nonexistent'));
     }
 
     /**
@@ -763,7 +765,7 @@ class ModulesTest extends TestCase
         $lower = Modules::getModule('alpha');
         $upper = Modules::getModule('ALPHA');
 
-        static::assertSame($lower, $upper);
+        self::assertSame($lower, $upper);
     }
 
     /**
@@ -777,10 +779,10 @@ class ModulesTest extends TestCase
 
         $modules = Modules::getModules();
 
-        static::assertArrayHasKey('alpha', $modules);
-        static::assertArrayHasKey('beta', $modules);
-        static::assertArrayHasKey('.hidden', $modules);
-        static::assertCount(3, $modules);
+        self::assertArrayHasKey('alpha', $modules);
+        self::assertArrayHasKey('beta', $modules);
+        self::assertArrayHasKey('.hidden', $modules);
+        self::assertCount(3, $modules);
     }
 
     /**
@@ -790,7 +792,7 @@ class ModulesTest extends TestCase
      */
     public function testModuleSeparatorConstant(): void
     {
-        static::assertSame('::', Modules::MODULE_SEPARATOR);
+        self::assertSame('::', Modules::MODULE_SEPARATOR);
     }
 
     /**
@@ -809,10 +811,10 @@ class ModulesTest extends TestCase
             . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'modules.php';
 
-        static::assertFileExists($cachePath);
+        self::assertFileExists($cachePath);
 
         // The temp file should not persist after a successful cache
-        static::assertFileDoesNotExist($cachePath . '.tmp');
+        self::assertFileDoesNotExist($cachePath . '.tmp');
     }
 
     /**
@@ -836,7 +838,7 @@ class ModulesTest extends TestCase
         // Should fall back to discovery instead of using invalid cache
         $routes = Modules::routePaths();
 
-        static::assertArrayHasKey('alpha', $routes);
+        self::assertArrayHasKey('alpha', $routes);
     }
 
     /**
@@ -863,11 +865,11 @@ class ModulesTest extends TestCase
             true,
         );
 
-        // cache() must flush the primed state before writing fresh discovery,
+        // The cache() call must flush primed state before writing discovery,
         // so the subsequent read reflects epsilon.
         Modules::cache();
 
-        static::assertArrayHasKey('epsilon', Modules::viewPaths());
+        self::assertArrayHasKey('epsilon', Modules::viewPaths());
     }
 
     /**
@@ -893,8 +895,8 @@ class ModulesTest extends TestCase
 
         $second = Modules::getModules();
 
-        static::assertSame($first, $second);
-        static::assertArrayNotHasKey('zeta', $second);
+        self::assertSame($first, $second);
+        self::assertArrayNotHasKey('zeta', $second);
     }
 
     /**
@@ -916,7 +918,7 @@ class ModulesTest extends TestCase
                 . DIRECTORY_SEPARATOR . 'Resources',
         );
 
-        static::assertSame($expected, $path);
+        self::assertSame($expected, $path);
     }
 
     /**
@@ -947,7 +949,7 @@ class ModulesTest extends TestCase
                 . DIRECTORY_SEPARATOR . 'Resources',
         );
 
-        static::assertSame($expected, $path);
+        self::assertSame($expected, $path);
     }
 
     /**
@@ -961,7 +963,7 @@ class ModulesTest extends TestCase
         Modules::setBasePath($this->tempDir);
 
         // Beta exists but has no views directory, so it is filtered out.
-        static::assertArrayNotHasKey('beta', Modules::viewPaths());
+        self::assertArrayNotHasKey('beta', Modules::viewPaths());
 
         // Create beta's views directory after the paths have been resolved.
         mkdir(
@@ -975,7 +977,7 @@ class ModulesTest extends TestCase
         );
 
         // The resolved paths are memoized, so beta must remain absent.
-        static::assertArrayNotHasKey('beta', Modules::viewPaths());
+        self::assertArrayNotHasKey('beta', Modules::viewPaths());
     }
 
     /**

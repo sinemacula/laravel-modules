@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Support\Spies;
 
 use Illuminate\Filesystem\Filesystem;
@@ -19,7 +21,7 @@ use Illuminate\Filesystem\Filesystem;
  *
  * @phpstan-ignore class.childType (test double subclasses the filesystem to record writes)
  */
-class RecordingFilesystem extends Filesystem
+final class RecordingFilesystem extends Filesystem
 {
     /** @var list<array{path: string, contents: string}> The recorded file writes. */
     public array $writes = [];

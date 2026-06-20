@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Support\Concerns;
 
 /**
@@ -39,9 +41,11 @@ trait ManagesTemporaryFiles
      */
     protected function removeTempDirectory(): void
     {
-        if ($this->tempDir !== '' && is_dir($this->tempDir)) {
-            $this->removeDirectory($this->tempDir);
+        if ($this->tempDir === '' || !is_dir($this->tempDir)) {
+            return;
         }
+
+        $this->removeDirectory($this->tempDir);
     }
 
     /**
@@ -56,9 +60,11 @@ trait ManagesTemporaryFiles
             . DIRECTORY_SEPARATOR
             . $relativePath;
 
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
+        if (is_dir($path)) {
+            return;
         }
+
+        mkdir($path, 0755, true);
     }
 
     /**
@@ -68,10 +74,8 @@ trait ManagesTemporaryFiles
      * @param  string  $content
      * @return void
      */
-    protected function createFile(
-        string $relativePath,
-        string $content = '',
-    ): void {
+    protected function createFile(string $relativePath, string $content = ''): void
+    {
         $path = $this->tempDir
             . DIRECTORY_SEPARATOR
             . $relativePath;

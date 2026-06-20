@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit\Configuration\Enums;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -15,7 +17,7 @@ use SineMacula\Laravel\Modules\Configuration\Enums\ModulePath;
  * @internal
  */
 #[CoversClass(ModulePath::class)]
-class ModulePathTest extends TestCase
+final class ModulePathTest extends TestCase
 {
     /**
      * Test that all expected enum cases exist.
@@ -26,7 +28,7 @@ class ModulePathTest extends TestCase
     {
         $cases = ModulePath::cases();
 
-        static::assertCount(9, $cases);
+        self::assertCount(9, $cases);
     }
 
     /**
@@ -36,7 +38,7 @@ class ModulePathTest extends TestCase
      */
     public function testModulesValue(): void
     {
-        static::assertSame('modules', ModulePath::MODULES->value);
+        self::assertSame('modules', ModulePath::MODULES->value);
     }
 
     /**
@@ -46,7 +48,7 @@ class ModulePathTest extends TestCase
      */
     public function testCacheValue(): void
     {
-        static::assertSame(
+        self::assertSame(
             'bootstrap/cache/modules.php',
             ModulePath::CACHE->value,
         );
@@ -59,7 +61,7 @@ class ModulePathTest extends TestCase
      */
     public function testListenersValue(): void
     {
-        static::assertSame('Listeners', ModulePath::LISTENERS->value);
+        self::assertSame('Listeners', ModulePath::LISTENERS->value);
     }
 
     /**
@@ -69,7 +71,7 @@ class ModulePathTest extends TestCase
      */
     public function testCommandsValue(): void
     {
-        static::assertSame('Console/Commands', ModulePath::COMMANDS->value);
+        self::assertSame('Console/Commands', ModulePath::COMMANDS->value);
     }
 
     /**
@@ -79,7 +81,7 @@ class ModulePathTest extends TestCase
      */
     public function testResourcesValue(): void
     {
-        static::assertSame('Resources', ModulePath::RESOURCES->value);
+        self::assertSame('Resources', ModulePath::RESOURCES->value);
     }
 
     /**
@@ -89,7 +91,7 @@ class ModulePathTest extends TestCase
      */
     public function testViewsValue(): void
     {
-        static::assertSame('Resources/views', ModulePath::VIEWS->value);
+        self::assertSame('Resources/views', ModulePath::VIEWS->value);
     }
 
     /**
@@ -99,7 +101,7 @@ class ModulePathTest extends TestCase
      */
     public function testLangValue(): void
     {
-        static::assertSame('Resources/lang', ModulePath::LANG->value);
+        self::assertSame('Resources/lang', ModulePath::LANG->value);
     }
 
     /**
@@ -109,7 +111,7 @@ class ModulePathTest extends TestCase
      */
     public function testRoutesValue(): void
     {
-        static::assertSame('Http/routes.php', ModulePath::ROUTES->value);
+        self::assertSame('Http/routes.php', ModulePath::ROUTES->value);
     }
 
     /**
@@ -119,7 +121,7 @@ class ModulePathTest extends TestCase
      */
     public function testSchedulesValue(): void
     {
-        static::assertSame('Console/schedule.php', ModulePath::SCHEDULES->value);
+        self::assertSame('Console/schedule.php', ModulePath::SCHEDULES->value);
     }
 
     /**
@@ -131,7 +133,7 @@ class ModulePathTest extends TestCase
     {
         $case = ModulePath::MODULES;
 
-        static::assertIsString($case->value);
+        self::assertIsString($case->value);
     }
 
     /**
@@ -143,7 +145,7 @@ class ModulePathTest extends TestCase
     {
         $case = ModulePath::tryFrom('nonexistent');
 
-        static::assertNull($case);
+        self::assertNull($case);
     }
 
     /**
@@ -155,6 +157,6 @@ class ModulePathTest extends TestCase
     {
         $case = ModulePath::from('modules');
 
-        static::assertSame(ModulePath::MODULES, $case);
+        self::assertSame(ModulePath::MODULES, $case);
     }
 }

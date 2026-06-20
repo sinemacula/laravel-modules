@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit\Console\Commands;
 
 use Illuminate\Filesystem\Filesystem;
@@ -24,7 +26,7 @@ use Tests\Support\Spies\RecordingFilesystem;
  * @internal
  */
 #[CoversClass(ModuleMakeCommand::class)]
-class ModuleMakeCommandTest extends TestCase
+final class ModuleMakeCommandTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -78,12 +80,12 @@ class ModuleMakeCommandTest extends TestCase
 
         $modulePath = $this->modulePath('Billing');
 
-        static::assertDirectoryExists($modulePath);
-        static::assertDirectoryExists($modulePath . '/Console/Commands');
-        static::assertDirectoryExists($modulePath . '/Http/Controllers');
-        static::assertDirectoryExists($modulePath . '/Http/Requests');
-        static::assertDirectoryExists($modulePath . '/Listeners');
-        static::assertDirectoryExists($modulePath . '/Models');
+        self::assertDirectoryExists($modulePath);
+        self::assertDirectoryExists($modulePath . '/Console/Commands');
+        self::assertDirectoryExists($modulePath . '/Http/Controllers');
+        self::assertDirectoryExists($modulePath . '/Http/Requests');
+        self::assertDirectoryExists($modulePath . '/Listeners');
+        self::assertDirectoryExists($modulePath . '/Models');
     }
 
     /**
@@ -99,11 +101,11 @@ class ModuleMakeCommandTest extends TestCase
         $modulePath = $this->modulePath('Billing');
         $written    = $this->filesystem->writtenPaths();
 
-        static::assertContains($modulePath . '/Console/Commands/.gitkeep', $written);
-        static::assertContains($modulePath . '/Http/Controllers/.gitkeep', $written);
-        static::assertContains($modulePath . '/Http/Requests/.gitkeep', $written);
-        static::assertContains($modulePath . '/Listeners/.gitkeep', $written);
-        static::assertContains($modulePath . '/Models/.gitkeep', $written);
+        self::assertContains($modulePath . '/Console/Commands/.gitkeep', $written);
+        self::assertContains($modulePath . '/Http/Controllers/.gitkeep', $written);
+        self::assertContains($modulePath . '/Http/Requests/.gitkeep', $written);
+        self::assertContains($modulePath . '/Listeners/.gitkeep', $written);
+        self::assertContains($modulePath . '/Models/.gitkeep', $written);
     }
 
     /**
@@ -125,9 +127,9 @@ class ModuleMakeCommandTest extends TestCase
             static fn (array $write): bool => $write['path'] === $routesFile,
         ));
 
-        static::assertCount(1, $routes);
-        static::assertStringContainsString('<?php', $routes[0]['contents']);
-        static::assertStringContainsString('use Illuminate\Support\Facades\Route;', $routes[0]['contents']);
+        self::assertCount(1, $routes);
+        self::assertStringContainsString('<?php', $routes[0]['contents']);
+        self::assertStringContainsString('use Illuminate\Support\Facades\Route;', $routes[0]['contents']);
     }
 
     /**
@@ -139,7 +141,7 @@ class ModuleMakeCommandTest extends TestCase
     {
         $this->runMakeCommand('order-management');
 
-        static::assertDirectoryExists(
+        self::assertDirectoryExists(
             $this->modulePath('OrderManagement'),
         );
     }
@@ -155,7 +157,7 @@ class ModuleMakeCommandTest extends TestCase
 
         $exitCode = $this->runMakeCommand('billing');
 
-        static::assertSame(1, $exitCode);
+        self::assertSame(1, $exitCode);
     }
 
     /**
@@ -167,7 +169,7 @@ class ModuleMakeCommandTest extends TestCase
     {
         $exitCode = $this->runMakeCommand('billing');
 
-        static::assertSame(0, $exitCode);
+        self::assertSame(0, $exitCode);
     }
 
     /**
@@ -179,7 +181,7 @@ class ModuleMakeCommandTest extends TestCase
     {
         $this->runMakeCommand('billing');
 
-        static::assertStringContainsString('Module [Billing] created successfully', $this->output);
+        self::assertStringContainsString('Module [Billing] created successfully', $this->output);
     }
 
     /**
@@ -193,7 +195,7 @@ class ModuleMakeCommandTest extends TestCase
 
         $this->runMakeCommand('billing');
 
-        static::assertStringContainsString('Module [Billing] already exists', $this->output);
+        self::assertStringContainsString('Module [Billing] already exists', $this->output);
     }
 
     /**

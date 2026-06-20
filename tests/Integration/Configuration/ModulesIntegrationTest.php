@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Integration\Configuration;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -24,7 +26,7 @@ use Tests\Support\Concerns\ManagesTemporaryFiles;
  * @internal
  */
 #[CoversClass(Modules::class)]
-class ModulesIntegrationTest extends TestCase
+final class ModulesIntegrationTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -71,19 +73,19 @@ class ModulesIntegrationTest extends TestCase
         $langPaths = Modules::langPaths();
 
         // Alpha has routes, views, and lang
-        static::assertArrayHasKey('alpha', $routes);
-        static::assertArrayHasKey('alpha', $viewPaths);
-        static::assertArrayHasKey('alpha', $langPaths);
+        self::assertArrayHasKey('alpha', $routes);
+        self::assertArrayHasKey('alpha', $viewPaths);
+        self::assertArrayHasKey('alpha', $langPaths);
 
         // Verify discovery via modulesPath containing all three
         $modulesPath = Modules::modulesPath();
-        static::assertDirectoryExists(
+        self::assertDirectoryExists(
             $modulesPath . DIRECTORY_SEPARATOR . 'alpha',
         );
-        static::assertDirectoryExists(
+        self::assertDirectoryExists(
             $modulesPath . DIRECTORY_SEPARATOR . 'beta',
         );
-        static::assertDirectoryExists(
+        self::assertDirectoryExists(
             $modulesPath . DIRECTORY_SEPARATOR . 'gamma',
         );
     }
@@ -110,8 +112,8 @@ class ModulesIntegrationTest extends TestCase
 
         $viewPaths = Modules::viewPaths();
 
-        static::assertArrayHasKey('deltamixed', $viewPaths);
-        static::assertArrayNotHasKey(
+        self::assertArrayHasKey('deltamixed', $viewPaths);
+        self::assertArrayNotHasKey(
             'DeltaMixed',
             $viewPaths,
         );
@@ -131,7 +133,7 @@ class ModulesIntegrationTest extends TestCase
         Modules::setBasePath($this->tempDir);
         $routesAfter = Modules::routePaths();
 
-        static::assertSame($routesBefore, $routesAfter);
+        self::assertSame($routesBefore, $routesAfter);
     }
 
     /**
@@ -146,13 +148,13 @@ class ModulesIntegrationTest extends TestCase
         $cachePath = $this->tempDir
             . '/bootstrap/cache/modules.php';
 
-        static::assertFileExists($cachePath);
+        self::assertFileExists($cachePath);
 
         $content = file_get_contents($cachePath);
-        static::assertStringStartsWith('<?php', $content);
+        self::assertStringStartsWith('<?php', $content);
 
         $modules = require $cachePath;
-        static::assertIsArray($modules);
+        self::assertIsArray($modules);
     }
 
     /**
@@ -167,7 +169,7 @@ class ModulesIntegrationTest extends TestCase
         Modules::clearCache();
         $routes = Modules::routePaths();
 
-        static::assertArrayHasKey('alpha', $routes);
+        self::assertArrayHasKey('alpha', $routes);
     }
 
     /**
@@ -184,7 +186,7 @@ class ModulesIntegrationTest extends TestCase
             $this->tempDir . '/modules/alpha/Resources',
         );
 
-        static::assertSame($expected, $path);
+        self::assertSame($expected, $path);
     }
 
     /**
@@ -197,7 +199,7 @@ class ModulesIntegrationTest extends TestCase
     {
         $path = Modules::resourcePath('views');
 
-        static::assertSame('', $path);
+        self::assertSame('', $path);
     }
 
     /**
@@ -209,10 +211,10 @@ class ModulesIntegrationTest extends TestCase
     {
         $routes = Modules::routePaths();
 
-        static::assertArrayHasKey('alpha', $routes);
-        static::assertArrayNotHasKey('beta', $routes);
-        static::assertArrayNotHasKey('gamma', $routes);
-        static::assertCount(1, $routes);
+        self::assertArrayHasKey('alpha', $routes);
+        self::assertArrayNotHasKey('beta', $routes);
+        self::assertArrayNotHasKey('gamma', $routes);
+        self::assertCount(1, $routes);
     }
 
     /**
@@ -225,10 +227,10 @@ class ModulesIntegrationTest extends TestCase
     {
         $views = Modules::viewPaths();
 
-        static::assertArrayHasKey('alpha', $views);
-        static::assertArrayNotHasKey('beta', $views);
-        static::assertArrayNotHasKey('gamma', $views);
-        static::assertCount(1, $views);
+        self::assertArrayHasKey('alpha', $views);
+        self::assertArrayNotHasKey('beta', $views);
+        self::assertArrayNotHasKey('gamma', $views);
+        self::assertCount(1, $views);
     }
 
     /**
@@ -240,10 +242,10 @@ class ModulesIntegrationTest extends TestCase
     {
         $langs = Modules::langPaths();
 
-        static::assertArrayHasKey('alpha', $langs);
-        static::assertArrayNotHasKey('beta', $langs);
-        static::assertArrayNotHasKey('gamma', $langs);
-        static::assertCount(1, $langs);
+        self::assertArrayHasKey('alpha', $langs);
+        self::assertArrayNotHasKey('beta', $langs);
+        self::assertArrayNotHasKey('gamma', $langs);
+        self::assertCount(1, $langs);
     }
 
     /**
@@ -269,9 +271,9 @@ class ModulesIntegrationTest extends TestCase
 
         $routes = Modules::routePaths();
 
-        static::assertArrayHasKey('alpha', $routes);
-        static::assertArrayNotHasKey('beta', $routes);
-        static::assertArrayNotHasKey('gamma', $routes);
+        self::assertArrayHasKey('alpha', $routes);
+        self::assertArrayNotHasKey('beta', $routes);
+        self::assertArrayNotHasKey('gamma', $routes);
     }
 
     /**
@@ -297,22 +299,22 @@ class ModulesIntegrationTest extends TestCase
         file_put_contents($cachePath, $content);
 
         $routesBefore = Modules::routePaths();
-        static::assertCount(1, $routesBefore);
+        self::assertCount(1, $routesBefore);
 
         Modules::clearCache();
         Modules::setBasePath($this->tempDir);
         $routesAfter = Modules::routePaths();
 
-        static::assertArrayHasKey('alpha', $routesAfter);
+        self::assertArrayHasKey('alpha', $routesAfter);
 
         $modulesPath = Modules::modulesPath();
-        static::assertDirectoryExists(
+        self::assertDirectoryExists(
             $modulesPath . DIRECTORY_SEPARATOR . 'alpha',
         );
-        static::assertDirectoryExists(
+        self::assertDirectoryExists(
             $modulesPath . DIRECTORY_SEPARATOR . 'beta',
         );
-        static::assertDirectoryExists(
+        self::assertDirectoryExists(
             $modulesPath . DIRECTORY_SEPARATOR . 'gamma',
         );
     }

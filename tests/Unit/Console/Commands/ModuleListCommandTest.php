@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit\Console\Commands;
 
 use Illuminate\Foundation\Application;
@@ -21,7 +23,7 @@ use Tests\Support\Concerns\ManagesTemporaryFiles;
  * @internal
  */
 #[CoversClass(ModuleListCommand::class)]
-class ModuleListCommandTest extends TestCase
+final class ModuleListCommandTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -70,8 +72,8 @@ class ModuleListCommandTest extends TestCase
 
         $output = $this->runListCommand();
 
-        static::assertStringContainsString('Module', $output);
-        static::assertStringContainsString('Path', $output);
+        self::assertStringContainsString('Module', $output);
+        self::assertStringContainsString('Path', $output);
     }
 
     /**
@@ -89,8 +91,8 @@ class ModuleListCommandTest extends TestCase
 
         $output = $this->runListCommand();
 
-        static::assertStringContainsString('alpha', $output);
-        static::assertStringContainsString('beta', $output);
+        self::assertStringContainsString('alpha', $output);
+        self::assertStringContainsString('beta', $output);
     }
 
     /**
@@ -109,8 +111,8 @@ class ModuleListCommandTest extends TestCase
 
         $output = $this->runListCommand();
 
-        static::assertMatchesRegularExpression('/\|\s+alpha\s+\|/', $output);
-        static::assertMatchesRegularExpression('/\|\s+beta\s+\|/', $output);
+        self::assertMatchesRegularExpression('/\|\s+alpha\s+\|/', $output);
+        self::assertMatchesRegularExpression('/\|\s+beta\s+\|/', $output);
     }
 
     /**
@@ -122,7 +124,7 @@ class ModuleListCommandTest extends TestCase
     {
         $output = $this->runListCommand();
 
-        static::assertStringContainsString('No modules discovered', $output);
+        self::assertStringContainsString('No modules discovered', $output);
     }
 
     /**
@@ -134,8 +136,8 @@ class ModuleListCommandTest extends TestCase
     {
         $output = $this->runListCommand();
 
-        static::assertStringNotContainsString('Module', $output);
-        static::assertStringNotContainsString('Path', $output);
+        self::assertStringNotContainsString('Module', $output);
+        self::assertStringNotContainsString('Path', $output);
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Feature\Console\Commands;
 
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,7 +28,7 @@ use Tests\TestCase;
  */
 #[CoversClass(ModuleCacheCommand::class)]
 #[CoversClass(ModuleClearCommand::class)]
-class ModuleCacheCommandTest extends TestCase
+final class ModuleCacheCommandTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -100,12 +102,12 @@ class ModuleCacheCommandTest extends TestCase
     {
         $this->artisan('module:cache');
 
-        static::assertFileExists($this->cachePath);
+        self::assertFileExists($this->cachePath);
 
         $modules = require $this->cachePath;
 
-        static::assertIsArray($modules);
-        static::assertArrayHasKey('alpha', $modules);
+        self::assertIsArray($modules);
+        self::assertArrayHasKey('alpha', $modules);
     }
 
     /**
@@ -139,10 +141,10 @@ class ModuleCacheCommandTest extends TestCase
     public function testCacheFileRemovedFromDisk(): void
     {
         $this->artisan('module:cache');
-        static::assertFileExists($this->cachePath);
+        self::assertFileExists($this->cachePath);
 
         $this->artisan('module:clear');
-        static::assertFileDoesNotExist($this->cachePath);
+        self::assertFileDoesNotExist($this->cachePath);
     }
 
     /**
@@ -152,7 +154,7 @@ class ModuleCacheCommandTest extends TestCase
      */
     public function testClearCommandSucceedsWithoutExistingCache(): void
     {
-        static::assertFileDoesNotExist($this->cachePath);
+        self::assertFileDoesNotExist($this->cachePath);
 
         $this->artisan('module:clear')
             ->assertExitCode(0); // @phpstan-ignore method.nonObject (untyped pending-command API)

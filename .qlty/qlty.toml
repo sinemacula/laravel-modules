@@ -80,7 +80,6 @@ version = "3.89.0"
 [[plugin]]
 name = "phpstan"
 version = "2.1.46"
-package_file = "composer.json"
 
 [[plugin]]
 name = "radarlint-php"
@@ -98,6 +97,13 @@ name = "trufflehog"
 
 [[plugin]]
 name = "yamllint"
+
+# phpstan + larastan need the project's dependencies installed so larastan can
+# bootstrap the application and resolve framework symbols. package_file alone
+# does not run a full composer install (larastan then fails to bootstrap and the
+# cloud build errors), so install via a prepare script instead. Do not remove.
+[plugins.definitions.phpstan.drivers.lint]
+prepare_script = "~/.qlty/cache/tools/composer/generic-42cc848a9f5e/composer.phar install --no-scripts --ignore-platform-reqs"
 
 # Skip radarlint smell analysis on the test and benchmark trees. Reused fixture
 # literals, multi-branch data providers, and benchmark subjects that share a body

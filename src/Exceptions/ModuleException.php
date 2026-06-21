@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace SineMacula\Laravel\Modules\Exceptions;
 
 /**
@@ -11,4 +13,4 @@ namespace SineMacula\Laravel\Modules\Exceptions;
  * @author      Ben Carey <bdmc@sinemacula.co.uk>
  * @copyright   2026 Sine Macula Limited
  */
-class ModuleException extends \RuntimeException {}
+final class ModuleException extends \RuntimeException {}

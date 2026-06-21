@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace SineMacula\Laravel\Modules\Providers;
 
 use Illuminate\Support\ServiceProvider;
@@ -14,6 +16,8 @@ use SineMacula\Laravel\Modules\Console\Commands\ModuleMakeCommand;
  *
  * Registers module views, translations, and optimization commands for the
  * modular architecture.
+ *
+ * @inheritable Subclassed by the test spy to record protected boot calls.
  *
  * @author      Ben Carey <bdmc@sinemacula.co.uk>
  * @copyright   2026 Sine Macula Limited

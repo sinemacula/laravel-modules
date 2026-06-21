@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace SineMacula\Laravel\Modules\Console\Commands;
 
 use Illuminate\Console\Command;
@@ -13,7 +15,7 @@ use SineMacula\Laravel\Modules\Configuration\Modules;
  * @author      Ben Carey <bdmc@sinemacula.co.uk>
  * @copyright   2026 Sine Macula Limited
  */
-class ModuleMakeCommand extends Command
+final class ModuleMakeCommand extends Command
 {
     /** @var list<string> The directories to create within a new module. */
     private const array DIRECTORIES = [

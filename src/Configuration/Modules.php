@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace SineMacula\Laravel\Modules\Configuration;
 
 use SineMacula\Laravel\Modules\Configuration\Enums\ModulePath;
@@ -18,7 +20,7 @@ use SineMacula\Laravel\Modules\Exceptions\ModuleException;
  *
  * @SuppressWarnings("php:S1448")
  */
-class Modules
+final class Modules
 {
     /** @var string The separator used in module-scoped paths. */
     public const string MODULE_SEPARATOR = '::';
@@ -27,13 +29,13 @@ class Modules
     private const string DEFAULT_MODULE = 'foundation';
 
     /** @var string The base path to the root application directory. */
-    private static string $basePath;
+    private static string $basePath; // @phpstan-ignore sineMacula.mutableStaticProperty (intentional static state for the module facade)
 
     /** @var array<string, string>|null The discovered module paths keyed by module name. */
-    private static ?array $modules = null;
+    private static ?array $modules = null; // @phpstan-ignore sineMacula.mutableStaticProperty (intentional static state for the module facade)
 
     /** @var array<string, array<string, string>> Resolved paths keyed by path type. */
-    private static array $resolvedPaths = [];
+    private static array $resolvedPaths = []; // @phpstan-ignore sineMacula.mutableStaticProperty (intentional static state for the module facade)
 
     /**
      * Set the base path for the module resolver.
@@ -181,7 +183,7 @@ class Modules
      */
     public static function getModules(): array
     {
-        return self::$modules ??= self::resolveModules();
+        return self::$modules ??= self::loadModulesFromCache() ?? self::discoverModules();
     }
 
     /**
@@ -224,9 +226,11 @@ class Modules
 
         foreach ($directory as $fileInfo) {
 
-            if ($fileInfo->isDir() && !$fileInfo->isDot()) {
-                $modules[strtolower($fileInfo->getFilename())] = $fileInfo->getRealPath();
+            if (!$fileInfo->isDir() || $fileInfo->isDot()) {
+                continue;
             }
+
+            $modules[strtolower($fileInfo->getFilename())] = $fileInfo->getRealPath();
         }
 
         return $modules;
@@ -268,9 +272,8 @@ class Modules
      * @param  string  $path
      * @return string|null
      */
-    private static function extractModuleFromPath(
-        string $path,
-    ): ?string {
+    private static function extractModuleFromPath(string $path): ?string
+    {
         $parts = explode(self::MODULE_SEPARATOR, $path, 2);
 
         if (count($parts) === 2 && $parts[0] !== '') {
@@ -306,16 +309,6 @@ class Modules
             array_map('realpath', $paths),
             static fn (false|string $path): bool => $path !== false,
         );
-    }
-
-    /**
-     * Resolve the modules from cache or discovery.
-     *
-     * @return array<string, string>
-     */
-    private static function resolveModules(): array
-    {
-        return self::loadModulesFromCache() ?? self::discoverModules();
     }
 
     /**

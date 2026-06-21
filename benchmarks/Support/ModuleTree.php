@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Benchmarks\Support;
 
 use Illuminate\Filesystem\Filesystem;
@@ -28,10 +30,10 @@ final class ModuleTree
     ];
 
     /** @var \ReflectionProperty|null Cached handle to the Modules::$modules property. */
-    private static ?\ReflectionProperty $modulesProperty = null;
+    private static ?\ReflectionProperty $modulesProperty = null; // @phpstan-ignore sineMacula.mutableStaticProperty (cached reflection handle for state resets)
 
     /** @var \ReflectionProperty|null Cached handle to the Modules::$resolvedPaths property. */
-    private static ?\ReflectionProperty $resolvedPathsProperty = null;
+    private static ?\ReflectionProperty $resolvedPathsProperty = null; // @phpstan-ignore sineMacula.mutableStaticProperty (cached reflection handle for state resets)
 
     /** @var string The root path of the temporary application. */
     private readonly string $basePath;
@@ -107,7 +109,7 @@ final class ModuleTree
      */
     private function build(int $moduleCount): void
     {
-        // The foundation module is the default used by resourcePath() resolution.
+        // The foundation module is the default for resourcePath() resolution.
         $this->createModule('foundation');
 
         for ($index = 0; $index < $moduleCount; $index++) {
@@ -147,9 +149,11 @@ final class ModuleTree
     {
         $path = $this->basePath . DIRECTORY_SEPARATOR . $relativePath;
 
-        if (!is_dir($path)) {
-            mkdir($path, 0755, true);
+        if (is_dir($path)) {
+            return;
         }
+
+        mkdir($path, 0755, true);
     }
 
     /**

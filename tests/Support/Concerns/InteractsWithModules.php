@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Support\Concerns;
 
 use SineMacula\Laravel\Modules\Configuration\Modules;
@@ -60,7 +62,7 @@ trait InteractsWithModules
      */
     protected function createModuleStructure(array $modules): void
     {
-        /** @phpstan-ignore property.notFound (tempDir is provided by the ManagesTemporaryFiles trait composed alongside this one) */
+        // @phpstan-ignore property.notFound (tempDir from sibling trait)
         $base = $this->tempDir;
 
         $modulesDir = $base . DIRECTORY_SEPARATOR . 'modules';
@@ -83,9 +85,11 @@ trait InteractsWithModules
                     . DIRECTORY_SEPARATOR
                     . $subdirectory;
 
-                if (!is_dir($path)) {
-                    mkdir($path, 0755, true);
+                if (is_dir($path)) {
+                    continue;
                 }
+
+                mkdir($path, 0755, true);
             }
         }
     }

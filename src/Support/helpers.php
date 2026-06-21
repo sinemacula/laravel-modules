@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /*
 |-------------------------------------------------------------------------------
 | Global Helper Functions
@@ -21,7 +23,7 @@ if (!function_exists('module_path')) { // @codeCoverageIgnoreStart
      *
      * @SuppressWarnings("php:S100")
      */
-    function module_path(string $path = ''): string
+    function module_path(string $path = ''): string // phpcs:ignore Squiz.NamingConventions.ValidFunctionName.NotCamelCaps
     {
         return Modules::modulesPath() . ($path ? DIRECTORY_SEPARATOR . $path : '');
     }

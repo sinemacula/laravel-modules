@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace SineMacula\Laravel\Modules\Configuration;
 
 use Illuminate\Foundation\Configuration\ApplicationBuilder as BaseApplicationBuilder;
 
 /**
  * Build the configuration for the modularised Laravel application.
+ *
+ * @inheritable Subclassed by the test spy to capture registration calls.
  *
  * @author      Ben Carey <bdmc@sinemacula.co.uk>
  * @copyright   2026 Sine Macula Limited

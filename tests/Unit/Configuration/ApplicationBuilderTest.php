@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit\Configuration;
 
 use Illuminate\Foundation\Application;
@@ -21,7 +23,7 @@ use Tests\Support\Spies\SpyApplicationBuilder;
  * @internal
  */
 #[CoversClass(ApplicationBuilder::class)]
-class ApplicationBuilderTest extends TestCase
+final class ApplicationBuilderTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -33,6 +35,7 @@ class ApplicationBuilderTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -58,6 +61,7 @@ class ApplicationBuilderTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function tearDown(): void
     {
         $this->resetModulesState();
@@ -79,7 +83,7 @@ class ApplicationBuilderTest extends TestCase
 
         $returned = $builder->withModules();
 
-        static::assertSame($builder, $returned);
+        self::assertSame($builder, $returned);
     }
 
     /**
@@ -102,8 +106,8 @@ class ApplicationBuilderTest extends TestCase
 
         $builder->withModules();
 
-        static::assertNotEmpty($builder->capturedEvents);
-        static::assertContains(realpath($listenersDir), $builder->capturedEvents);
+        self::assertNotEmpty($builder->capturedEvents);
+        self::assertContains(realpath($listenersDir), $builder->capturedEvents);
     }
 
     /**
@@ -131,7 +135,7 @@ class ApplicationBuilderTest extends TestCase
             $consoleDir . DIRECTORY_SEPARATOR . 'schedule.php',
         );
 
-        static::assertContains(
+        self::assertContains(
             $scheduleFile,
             $builder->capturedCommands,
         );
@@ -158,7 +162,7 @@ class ApplicationBuilderTest extends TestCase
 
         $builder->withModules();
 
-        static::assertContains(
+        self::assertContains(
             realpath($commandsDir),
             $builder->capturedCommands,
         );
@@ -177,7 +181,7 @@ class ApplicationBuilderTest extends TestCase
 
         $builder->withModules();
 
-        static::assertTrue($builder->withKernelsCalled);
+        self::assertTrue($builder->withKernelsCalled);
     }
 
     /**
@@ -193,7 +197,7 @@ class ApplicationBuilderTest extends TestCase
 
         $builder->withModules();
 
-        static::assertTrue($builder->withProvidersCalled);
+        self::assertTrue($builder->withProvidersCalled);
     }
 
     /**
@@ -209,8 +213,8 @@ class ApplicationBuilderTest extends TestCase
 
         $builder->withModules();
 
-        static::assertEmpty($builder->capturedEvents);
-        static::assertEmpty($builder->capturedCommands);
+        self::assertEmpty($builder->capturedEvents);
+        self::assertEmpty($builder->capturedCommands);
     }
 
     /**
@@ -241,17 +245,17 @@ class ApplicationBuilderTest extends TestCase
             $consoleDir . DIRECTORY_SEPARATOR . 'schedule.php',
         );
 
-        static::assertContains(
+        self::assertContains(
             $scheduleFile,
             $builder->capturedCommands,
         );
 
-        static::assertContains(
+        self::assertContains(
             realpath($commandsDir),
             $builder->capturedCommands,
         );
 
-        static::assertCount(2, $builder->capturedCommands);
+        self::assertCount(2, $builder->capturedCommands);
     }
 
     /**
@@ -287,12 +291,12 @@ class ApplicationBuilderTest extends TestCase
         $builder->withModules();
 
         // Both modules contribute a Listeners directory.
-        static::assertCount(2, $builder->capturedEvents);
-        static::assertTrue(array_is_list($builder->capturedEvents));
+        self::assertCount(2, $builder->capturedEvents);
+        self::assertTrue(array_is_list($builder->capturedEvents));
 
         // Both modules contribute a schedule file and a Commands directory.
-        static::assertCount(4, $builder->capturedCommands);
-        static::assertTrue(array_is_list($builder->capturedCommands));
+        self::assertCount(4, $builder->capturedCommands);
+        self::assertTrue(array_is_list($builder->capturedCommands));
     }
 
     /**

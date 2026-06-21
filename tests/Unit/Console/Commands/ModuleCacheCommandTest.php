@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit\Console\Commands;
 
 use Illuminate\Foundation\Application;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use SineMacula\Laravel\Modules\Configuration\Modules;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleCacheCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -24,7 +25,7 @@ use Tests\Support\Concerns\ManagesTemporaryFiles;
  * @internal
  */
 #[CoversClass(ModuleCacheCommand::class)]
-class ModuleCacheCommandTest extends TestCase
+final class ModuleCacheCommandTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -33,6 +34,7 @@ class ModuleCacheCommandTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -49,6 +51,7 @@ class ModuleCacheCommandTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function tearDown(): void
     {
         $this->resetModulesState();
@@ -76,11 +79,11 @@ class ModuleCacheCommandTest extends TestCase
             . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'modules.php';
 
-        static::assertFileExists($cachePath);
+        self::assertFileExists($cachePath);
 
         $modules = require $cachePath;
 
-        static::assertIsArray($modules);
-        static::assertArrayHasKey('alpha', $modules);
+        self::assertIsArray($modules);
+        self::assertArrayHasKey('alpha', $modules);
     }
 }

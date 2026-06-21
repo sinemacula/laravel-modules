@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit\Support;
 
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use SineMacula\Laravel\Modules\Configuration\Modules;
 use Tests\Support\Concerns\InteractsWithModules;
@@ -15,8 +18,8 @@ use Tests\Support\Concerns\ManagesTemporaryFiles;
  *
  * @internal
  */
-#[\PHPUnit\Framework\Attributes\CoversNothing]
-class HelpersTest extends TestCase
+#[CoversNothing]
+final class HelpersTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;
 
@@ -25,6 +28,7 @@ class HelpersTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -40,6 +44,7 @@ class HelpersTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function tearDown(): void
     {
         $this->resetModulesState();
@@ -59,7 +64,7 @@ class HelpersTest extends TestCase
         $expected = $this->tempDir
             . DIRECTORY_SEPARATOR . 'modules';
 
-        static::assertSame($expected, module_path());
+        self::assertSame($expected, module_path());
     }
 
     /**
@@ -73,7 +78,7 @@ class HelpersTest extends TestCase
             . DIRECTORY_SEPARATOR . 'modules'
             . DIRECTORY_SEPARATOR . 'User';
 
-        static::assertSame($expected, module_path('User'));
+        self::assertSame($expected, module_path('User'));
     }
 
     /**
@@ -87,6 +92,6 @@ class HelpersTest extends TestCase
         $expected = $this->tempDir
             . DIRECTORY_SEPARATOR . 'modules';
 
-        static::assertSame($expected, module_path(''));
+        self::assertSame($expected, module_path(''));
     }
 }

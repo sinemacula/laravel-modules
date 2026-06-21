@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Tests\Unit\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Facades\Facade;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -29,7 +32,7 @@ use Tests\Support\Spies\SpyModuleServiceProvider;
  * @internal
  */
 #[CoversClass(ModuleServiceProvider::class)]
-class ModuleServiceProviderTest extends TestCase
+final class ModuleServiceProviderTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles, MockeryPHPUnitIntegration;
 
@@ -38,6 +41,7 @@ class ModuleServiceProviderTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -52,6 +56,7 @@ class ModuleServiceProviderTest extends TestCase
      *
      * @return void
      */
+    #[\Override]
     protected function tearDown(): void
     {
         $this->resetModulesState();
@@ -80,7 +85,7 @@ class ModuleServiceProviderTest extends TestCase
 
         $provider->boot();
 
-        static::assertContains(
+        self::assertContains(
             [$viewPaths['alpha'], 'alpha'],
             $provider->loadViewsFromCalls,
         );
@@ -103,7 +108,7 @@ class ModuleServiceProviderTest extends TestCase
 
         $provider->boot();
 
-        static::assertContains(
+        self::assertContains(
             [$langPaths['alpha'], 'alpha'],
             $provider->loadTranslationsFromCalls,
         );
@@ -125,8 +130,8 @@ class ModuleServiceProviderTest extends TestCase
 
         $provider->boot();
 
-        static::assertCount(1, $provider->optimizesCalls);
-        static::assertSame(
+        self::assertCount(1, $provider->optimizesCalls);
+        self::assertSame(
             ['module:cache', 'module:clear', 'modules'],
             $provider->optimizesCalls[0],
         );
@@ -152,8 +157,8 @@ class ModuleServiceProviderTest extends TestCase
 
         $call = $provider->loadViewsFromCalls[0];
 
-        static::assertSame($viewPaths['beta'], $call[0]);
-        static::assertSame('beta', $call[1]);
+        self::assertSame($viewPaths['beta'], $call[0]);
+        self::assertSame('beta', $call[1]);
     }
 
     /**
@@ -176,8 +181,8 @@ class ModuleServiceProviderTest extends TestCase
 
         $call = $provider->loadTranslationsFromCalls[0];
 
-        static::assertSame($langPaths['beta'], $call[0]);
-        static::assertSame('beta', $call[1]);
+        self::assertSame($langPaths['beta'], $call[0]);
+        self::assertSame('beta', $call[1]);
     }
 
     /**
@@ -196,7 +201,7 @@ class ModuleServiceProviderTest extends TestCase
 
         $provider->boot();
 
-        static::assertEmpty($provider->loadViewsFromCalls);
+        self::assertEmpty($provider->loadViewsFromCalls);
     }
 
     /**
@@ -215,7 +220,7 @@ class ModuleServiceProviderTest extends TestCase
 
         $provider->boot();
 
-        static::assertEmpty($provider->loadTranslationsFromCalls);
+        self::assertEmpty($provider->loadTranslationsFromCalls);
     }
 
     /**
@@ -237,15 +242,15 @@ class ModuleServiceProviderTest extends TestCase
 
         $provider->boot();
 
-        static::assertCount(2, $provider->loadViewsFromCalls);
+        self::assertCount(2, $provider->loadViewsFromCalls);
 
         $modules = array_column(
             $provider->loadViewsFromCalls,
             1,
         );
 
-        static::assertContains('alpha', $modules);
-        static::assertContains('beta', $modules);
+        self::assertContains('alpha', $modules);
+        self::assertContains('beta', $modules);
     }
 
     /**
@@ -267,15 +272,15 @@ class ModuleServiceProviderTest extends TestCase
 
         $provider->boot();
 
-        static::assertCount(2, $provider->loadTranslationsFromCalls);
+        self::assertCount(2, $provider->loadTranslationsFromCalls);
 
         $modules = array_column(
             $provider->loadTranslationsFromCalls,
             1,
         );
 
-        static::assertContains('alpha', $modules);
-        static::assertContains('beta', $modules);
+        self::assertContains('alpha', $modules);
+        self::assertContains('beta', $modules);
     }
 
     /**
@@ -289,7 +294,7 @@ class ModuleServiceProviderTest extends TestCase
 
         Modules::setBasePath($this->tempDir);
 
-        $app = new \Illuminate\Foundation\Application($this->tempDir);
+        $app = new FoundationApplication($this->tempDir);
 
         $provider = new ModuleServiceProvider($app);
 
@@ -299,7 +304,7 @@ class ModuleServiceProviderTest extends TestCase
             ModuleCacheCommand::class,
         );
 
-        static::assertInstanceOf(
+        self::assertInstanceOf(
             ModuleCacheCommand::class,
             $resolved,
         );
@@ -316,25 +321,25 @@ class ModuleServiceProviderTest extends TestCase
 
         Modules::setBasePath($this->tempDir);
 
-        $app = new \Illuminate\Foundation\Application($this->tempDir);
+        $app = new FoundationApplication($this->tempDir);
 
         $provider = new ModuleServiceProvider($app);
 
         $provider->register();
 
-        static::assertInstanceOf(
+        self::assertInstanceOf(
             ModuleCacheCommand::class,
             $app->make(ModuleCacheCommand::class),
         );
-        static::assertInstanceOf(
+        self::assertInstanceOf(
             ModuleClearCommand::class,
             $app->make(ModuleClearCommand::class),
         );
-        static::assertInstanceOf(
+        self::assertInstanceOf(
             ModuleListCommand::class,
             $app->make(ModuleListCommand::class),
         );
-        static::assertInstanceOf(
+        self::assertInstanceOf(
             ModuleMakeCommand::class,
             $app->make(ModuleMakeCommand::class),
         );
@@ -349,13 +354,13 @@ class ModuleServiceProviderTest extends TestCase
     #[RunInSeparateProcess]
     public function testRegisterSetsBasePathFromApplication(): void
     {
-        $app = new \Illuminate\Foundation\Application($this->tempDir);
+        $app = new FoundationApplication($this->tempDir);
 
         $provider = new ModuleServiceProvider($app);
 
         $provider->register();
 
-        static::assertSame(
+        self::assertSame(
             $this->tempDir . DIRECTORY_SEPARATOR . 'modules',
             Modules::modulesPath(),
         );
@@ -368,7 +373,6 @@ class ModuleServiceProviderTest extends TestCase
      */
     private function createSpyProvider(): SpyModuleServiceProvider
     {
-        /** @var \Illuminate\Contracts\Foundation\Application&\Mockery\MockInterface $app */
         $app = \Mockery::mock(Application::class);
 
         return new SpyModuleServiceProvider($app); // @phpstan-ignore argument.type (the Mockery mock satisfies the Application contract the provider needs at runtime)

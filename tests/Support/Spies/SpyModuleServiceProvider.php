@@ -19,13 +19,13 @@ use SineMacula\Laravel\Modules\Providers\ModuleServiceProvider;
  */
 final class SpyModuleServiceProvider extends ModuleServiceProvider
 {
-    /** @var list<array{mixed, mixed}> */
+    /** @var list<array{string, string}> */
     public array $loadViewsFromCalls = [];
 
-    /** @var list<array{mixed, mixed}> */
+    /** @var list<array{string, string}> */
     public array $loadTranslationsFromCalls = [];
 
-    /** @var list<array{mixed, mixed, mixed}> */
+    /** @var list<array{string|null, string|null, string|null}> */
     public array $optimizesCalls = [];
 
     /**
@@ -38,6 +38,8 @@ final class SpyModuleServiceProvider extends ModuleServiceProvider
     #[\Override]
     protected function loadViewsFrom(mixed $path, mixed $namespace): void
     {
+        assert(is_string($path) && is_string($namespace));
+
         $this->loadViewsFromCalls[] = [$path, $namespace];
     }
 
@@ -51,6 +53,8 @@ final class SpyModuleServiceProvider extends ModuleServiceProvider
     #[\Override]
     protected function loadTranslationsFrom(mixed $path, mixed $namespace = null): void
     {
+        assert(is_string($path) && is_string($namespace));
+
         $this->loadTranslationsFromCalls[] = [$path, $namespace];
     }
 

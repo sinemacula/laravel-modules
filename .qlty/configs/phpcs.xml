@@ -1,44 +1,10 @@
 <?xml version="1.0"?>
 <ruleset name="Project">
 
-    <rule ref="SineMacula"/>
+    <rule ref="SineMaculaLaravelPackage"/>
 
     <file>src</file>
     <file>benchmarks</file>
     <file>tests</file>
-
-    <!--
-        Console command $signature/$description override Illuminate\Console\Command's
-        untyped properties; PHP forbids redeclaring them with a native type, so the
-        @var docblock carries the type instead.
-    -->
-    <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
-        <exclude-pattern>src/Console/Commands/*</exclude-pattern>
-    </rule>
-
-    <!--
-        Test doubles and suites legitimately break a handful of production
-        rules: recording spies expose mutable public state and accept parameters
-        that exist only to match an overridden framework signature, their
-        capture arrays hold mixed values, fixture builders branch more than
-        production code, and a single-class test suite naturally exceeds the
-        method cap. These are exempted only under tests/, mirroring the radarlint
-        test exemption already configured in qlty.toml.
-    -->
-    <rule ref="SineMacula.Classes.RequireReadonlyPublicProperty">
-        <exclude-pattern>tests/*</exclude-pattern>
-    </rule>
-    <rule ref="SineMacula.Metrics.MaxMethodCount">
-        <exclude-pattern>tests/*</exclude-pattern>
-    </rule>
-    <rule ref="SlevomatCodingStandard.Functions.UnusedParameter">
-        <exclude-pattern>tests/*</exclude-pattern>
-    </rule>
-    <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint">
-        <exclude-pattern>tests/*</exclude-pattern>
-    </rule>
-    <rule ref="SlevomatCodingStandard.Complexity.Cognitive">
-        <exclude-pattern>tests/*</exclude-pattern>
-    </rule>
 
 </ruleset>

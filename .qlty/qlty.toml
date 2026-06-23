@@ -45,7 +45,7 @@ default = true
 [[source]]
 name = "sinemacula"
 repository = "https://github.com/sinemacula/coding-standards"
-tag = "v1.3.1"
+tag = "v1.7.2"
 
 [[plugin]]
 name = "actionlint"
@@ -108,6 +108,14 @@ name = "yamllint"
 # bootstrap then dies. Do not remove.
 [plugins.definitions.phpstan.drivers.lint]
 prepare_script = "~/.qlty/cache/tools/composer/generic-42cc848a9f5e/composer.phar install --no-scripts --ignore-platform-req='ext-*'"
+
+# php-codesniffer 4.x exits with code 3 when it finds issues; qlty's default
+# success codes are [0, 1], so without this qlty treats a normal "issues found"
+# run as a hard failure and silently drops every phpcs finding (false green).
+# This must live here in the consumer's qlty.toml - a qlty bug drops all of a
+# source's exported configs if the block is placed in the shared source.toml.
+[plugins.definitions.php-codesniffer.drivers.lint]
+success_codes = [0, 1, 2, 3]
 
 # Skip radarlint smell analysis on the test and benchmark trees. Reused fixture
 # literals, multi-branch data providers, and benchmark subjects that share a body

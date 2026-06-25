@@ -151,7 +151,7 @@ final class ModulesTest extends TestCase
         Modules::setBasePath(dirname($cacheDir, 2));
 
         $this->expectException(ModuleException::class);
-        $this->expectExceptionMessage('Failed to write cache file at ' . $cachePath . '.');
+        $this->expectExceptionMessage('Failed to write temporary cache file at ' . $cachePath . '.tmp.');
 
         // Suppress the file_put_contents warning so PHPUnit sees the exception.
         set_error_handler(static fn (): bool => true);
@@ -535,10 +535,10 @@ final class ModulesTest extends TestCase
     {
         Modules::setBasePath($this->tempDir);
 
-        $views = Modules::viewPaths();
+        $modules = Modules::getModules();
 
-        self::assertArrayNotHasKey('.hidden', $views);
-        self::assertArrayNotHasKey('hidden', $views);
+        self::assertArrayNotHasKey('.hidden', $modules);
+        self::assertArrayNotHasKey('hidden', $modules);
     }
 
     /**
@@ -781,8 +781,8 @@ final class ModulesTest extends TestCase
 
         self::assertArrayHasKey('alpha', $modules);
         self::assertArrayHasKey('beta', $modules);
-        self::assertArrayHasKey('.hidden', $modules);
-        self::assertCount(3, $modules);
+        self::assertArrayNotHasKey('.hidden', $modules);
+        self::assertCount(2, $modules);
     }
 
     /**

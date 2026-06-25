@@ -64,7 +64,7 @@ final class Modules
         $tempPath  = $cachePath . '.tmp';
 
         if (file_put_contents($tempPath, $content) === false) {
-            throw new ModuleException('Failed to write cache file at ' . $cachePath . '.');
+            throw new ModuleException('Failed to write temporary cache file at ' . $tempPath . '.');
         }
 
         if (!rename($tempPath, $cachePath)) { // @codeCoverageIgnoreStart
@@ -226,7 +226,7 @@ final class Modules
 
         foreach ($directory as $fileInfo) {
 
-            if (!$fileInfo->isDir() || $fileInfo->isDot()) {
+            if (!$fileInfo->isDir() || str_starts_with($fileInfo->getFilename(), '.')) {
                 continue;
             }
 

@@ -72,7 +72,9 @@ final class ModuleCacheCommandTest extends TestCase
         $command = new ModuleCacheCommand;
         $command->setLaravel($app);
 
-        $command->run(new ArrayInput([]), new BufferedOutput);
+        $exitCode = $command->run(new ArrayInput([]), new BufferedOutput);
+
+        self::assertSame(ModuleCacheCommand::SUCCESS, $exitCode);
 
         $cachePath = $this->tempDir
             . DIRECTORY_SEPARATOR . 'bootstrap'
@@ -85,5 +87,42 @@ final class ModuleCacheCommandTest extends TestCase
 
         self::assertIsArray($modules);
         self::assertArrayHasKey('alpha', $modules);
+    }
+
+    /**
+     * Test that handle reports a clean error and returns FAILURE when the
+     * cache cannot be written.
+     *
+     * @return void
+     */
+    public function testHandleReturnsFailureWhenCacheWriteFails(): void
+    {
+        $app = new Application($this->tempDir);
+
+        $command = new ModuleCacheCommand;
+        $command->setLaravel($app);
+
+        $cacheDir = $this->tempDir
+            . DIRECTORY_SEPARATOR . 'bootstrap'
+            . DIRECTORY_SEPARATOR . 'cache';
+
+        chmod($cacheDir, 0555);
+
+        $output = new BufferedOutput;
+
+        // Suppress the file_put_contents warning so PHPUnit sees the result.
+        set_error_handler(static fn (): bool => true);
+
+        try {
+            $exitCode = $command->run(new ArrayInput([]), $output);
+        } finally {
+            restore_error_handler();
+
+            // Restore permissions so tearDown can clean up.
+            chmod($cacheDir, 0755);
+        }
+
+        self::assertSame(ModuleCacheCommand::FAILURE, $exitCode);
+        self::assertStringContainsString('Failed to write', $output->fetch());
     }
 }

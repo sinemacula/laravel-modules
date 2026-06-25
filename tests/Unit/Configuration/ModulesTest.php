@@ -269,6 +269,91 @@ final class ModulesTest extends TestCase
     }
 
     /**
+     * Test that clearCache returns true when the cache file is removed.
+     *
+     * @return void
+     */
+    public function testClearCacheReturnsTrueWhenFileRemoved(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        $cachePath = $this->tempDir
+            . DIRECTORY_SEPARATOR . 'bootstrap'
+            . DIRECTORY_SEPARATOR . 'cache'
+            . DIRECTORY_SEPARATOR . 'modules.php';
+
+        file_put_contents($cachePath, '<?php return [];');
+
+        self::assertTrue(Modules::clearCache());
+        self::assertFileDoesNotExist($cachePath);
+    }
+
+    /**
+     * Test that clearCache returns true when there is no cache file to remove.
+     *
+     * @return void
+     */
+    public function testClearCacheReturnsTrueWhenNoCacheFile(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        self::assertTrue(Modules::clearCache());
+    }
+
+    /**
+     * Test that clearCache returns false when the cache file cannot be removed.
+     *
+     * @return void
+     */
+    public function testClearCacheReturnsFalseWhenFileCannotBeRemoved(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        $cacheDir = $this->tempDir
+            . DIRECTORY_SEPARATOR . 'bootstrap'
+            . DIRECTORY_SEPARATOR . 'cache';
+
+        $cachePath = $cacheDir . DIRECTORY_SEPARATOR . 'modules.php';
+
+        file_put_contents($cachePath, '<?php return [];');
+
+        // Remove write permission on the directory so the unlink fails.
+        chmod($cacheDir, 0555);
+
+        try {
+            self::assertFalse(Modules::clearCache());
+            self::assertFileExists($cachePath);
+        } finally {
+            chmod($cacheDir, 0755);
+        }
+    }
+
+    /**
+     * Test that discoverModules throws a ModuleException when the modules
+     * directory exists but cannot be read.
+     *
+     * @return void
+     */
+    public function testDiscoverModulesThrowsWhenModulesDirectoryUnreadable(): void
+    {
+        $modulesDir = $this->tempDir . DIRECTORY_SEPARATOR . 'modules';
+
+        // Drop read permission so DirectoryIterator cannot open it.
+        chmod($modulesDir, 0000);
+
+        Modules::setBasePath($this->tempDir);
+
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage('Failed to read the modules directory at ' . $modulesDir . '.');
+
+        try {
+            Modules::getModules();
+        } finally {
+            chmod($modulesDir, 0755);
+        }
+    }
+
+    /**
      * Test that resourcePath resolves the correct Resources directory when a
      * module namespace is provided.
      *

@@ -38,18 +38,20 @@ modules/
 
 ### What Gets Discovered
 
-| Convention        | Module Path            | How It's Loaded                       |
-|-------------------|------------------------|---------------------------------------|
-| Routes            | `Http/routes.php`      | Passed to `withRouting(api: ...)`     |
-| Console commands  | `Console/Commands/`    | Glob-based via `withCommands()`       |
-| Scheduled tasks   | `Console/schedule.php` | Glob-based via `withCommands()`       |
-| Event listeners   | `Listeners/`           | Glob-based via `withEvents()`         |
-| Views             | `Resources/views/`     | Registered in `ModuleServiceProvider` |
-| Translations      | `Resources/lang/`      | Registered in `ModuleServiceProvider` |
-| Service providers | `Providers/`           | Loaded via `withProviders()`          |
+| Convention       | Module Path            | How It's Loaded                                  |
+|------------------|------------------------|--------------------------------------------------|
+| Console commands | `Console/Commands/`    | Auto-registered via `withCommands()`             |
+| Scheduled tasks  | `Console/schedule.php` | Auto-registered via `withCommands()`             |
+| Event listeners  | `Listeners/`           | Auto-registered via `withEvents()`               |
+| Views            | `Resources/views/`     | Auto-registered in `ModuleServiceProvider`       |
+| Translations     | `Resources/lang/`      | Auto-registered in `ModuleServiceProvider`       |
+| Routes           | `Http/routes.php`      | Discovered; you wire them in `bootstrap/app.php` |
 
 Everything else - controllers, requests, resources, events, observers, policies, models, jobs, mail, notifications -
 works via PSR-4 autoloading. No registration required.
+
+Service providers work exactly as they do in a standard Laravel app: register them in `bootstrap/providers.php`. The
+package does not auto-discover module providers, so you keep full control over their registration order.
 
 ### Artisan Commands
 
@@ -140,8 +142,9 @@ mkdir -p modules/Foundation/Providers
 
 ### 4. Wire up routing
 
-Each module defines its own routes in `Http/routes.php`. These are automatically discovered and passed to
-`withRouting()` as shown in the `bootstrap/app.php` example above.
+Each module defines its own routes in `Http/routes.php`. `Modules::routePaths()` discovers them for you; you wire the
+result into `withRouting()` in `bootstrap/app.php` (as shown above). Routing stays explicit, exactly like standard
+Laravel - the package just saves you from listing each module's route file by hand.
 
 ## Requirements
 
@@ -158,11 +161,13 @@ composer check
 
 ## Contributing
 
-Contributions are welcome via GitHub pull requests.
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on branching, commits, code
+quality, and pull requests.
 
 ## Security
 
-If you discover a security issue, please contact Sine Macula directly rather than opening a public issue.
+If you discover a security vulnerability, please report it responsibly. See [SECURITY.md](SECURITY.md) for the
+disclosure policy and contact details.
 
 ## License
 

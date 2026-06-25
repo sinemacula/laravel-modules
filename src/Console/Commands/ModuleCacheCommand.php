@@ -6,6 +6,7 @@ namespace SineMacula\Laravel\Modules\Console\Commands;
 
 use Illuminate\Console\Command;
 use SineMacula\Laravel\Modules\Configuration\Modules;
+use SineMacula\Laravel\Modules\Exceptions\ModuleException;
 
 /**
  * Cache the discovered module paths for faster resolution.
@@ -24,12 +25,20 @@ final class ModuleCacheCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function handle(): void
+    public function handle(): int
     {
-        Modules::cache();
+        try {
+            Modules::cache();
+        } catch (ModuleException $e) {
+            $this->components->error($e->getMessage());
+
+            return self::FAILURE;
+        }
 
         $this->components->info('Modules cached successfully.');
+
+        return self::SUCCESS;
     }
 }

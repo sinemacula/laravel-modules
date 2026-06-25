@@ -88,13 +88,19 @@ final class Modules
     /**
      * Clear the cached application modules.
      *
-     * @return void
+     * @return bool true when no cache file remains after the operation
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
-    public static function clearCache(): void
+    public static function clearCache(): bool
     {
-        @unlink(self::cachePath());
+        $path = self::cachePath();
+
+        $cleared = !file_exists($path) || @unlink($path);
 
         self::flush();
+
+        return $cleared;
     }
 
     /**
@@ -212,6 +218,8 @@ final class Modules
      * Auto-discover the modules within the application.
      *
      * @return array<string, string>
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     private static function discoverModules(): array
     {
@@ -221,8 +229,13 @@ final class Modules
             return [];
         }
 
-        $directory = new \DirectoryIterator($path);
-        $modules   = [];
+        try {
+            $directory = new \DirectoryIterator($path);
+        } catch (\UnexpectedValueException $exception) {
+            throw new ModuleException('Failed to read the modules directory at ' . $path . '.', previous: $exception);
+        }
+
+        $modules = [];
 
         foreach ($directory as $fileInfo) {
 

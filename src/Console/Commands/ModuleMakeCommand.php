@@ -49,7 +49,27 @@ final class ModuleMakeCommand extends Command
             return self::FAILURE; // @codeCoverageIgnore
         }
 
-        $name       = Str::studly($argument);
+        $name = Str::studly($argument);
+
+        if (preg_match('/^[A-Za-z][A-Za-z0-9]*$/', $name) !== 1) {
+
+            $this->components->error("Invalid module name [{$argument}].");
+
+            return self::FAILURE;
+        }
+
+        return $this->scaffold($filesystem, $name);
+    }
+
+    /**
+     * Scaffold the module directory structure on disk.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $filesystem
+     * @param  string  $name
+     * @return int
+     */
+    private function scaffold(Filesystem $filesystem, string $name): int
+    {
         $modulePath = Modules::modulesPath() . DIRECTORY_SEPARATOR . $name;
 
         if ($filesystem->isDirectory($modulePath)) {
@@ -59,18 +79,26 @@ final class ModuleMakeCommand extends Command
             return self::FAILURE;
         }
 
-        foreach (self::DIRECTORIES as $directory) {
+        try {
 
-            $path = $modulePath . DIRECTORY_SEPARATOR . $directory;
+            foreach (self::DIRECTORIES as $directory) {
 
-            $filesystem->ensureDirectoryExists($path);
-            $filesystem->put($path . DIRECTORY_SEPARATOR . '.gitkeep', '');
+                $path = $modulePath . DIRECTORY_SEPARATOR . $directory;
+
+                $filesystem->ensureDirectoryExists($path);
+                $filesystem->put($path . DIRECTORY_SEPARATOR . '.gitkeep', '');
+            }
+
+            $filesystem->put(
+                $modulePath . DIRECTORY_SEPARATOR . 'Http' . DIRECTORY_SEPARATOR . 'routes.php',
+                "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n",
+            );
+        } catch (\Throwable $exception) {
+
+            $this->components->error("Failed to create module [{$name}]: " . $exception->getMessage());
+
+            return self::FAILURE;
         }
-
-        $filesystem->put(
-            $modulePath . DIRECTORY_SEPARATOR . 'Http' . DIRECTORY_SEPARATOR . 'routes.php',
-            "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n",
-        );
 
         $this->components->info("Module [{$name}] created successfully.");
 

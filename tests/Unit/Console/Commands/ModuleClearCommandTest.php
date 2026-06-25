@@ -79,8 +79,43 @@ final class ModuleClearCommandTest extends TestCase
         $command = new ModuleClearCommand;
         $command->setLaravel($app);
 
-        $command->run(new ArrayInput([]), new BufferedOutput);
+        $exitCode = $command->run(new ArrayInput([]), new BufferedOutput);
 
+        self::assertSame(ModuleClearCommand::SUCCESS, $exitCode);
         self::assertFileDoesNotExist($cachePath);
+    }
+
+    /**
+     * Test that handle reports an error and returns FAILURE when the cache file
+     * cannot be removed.
+     *
+     * @return void
+     */
+    public function testHandleReturnsFailureWhenCacheCannotBeCleared(): void
+    {
+        Modules::cache();
+
+        $cacheDir = $this->tempDir
+            . DIRECTORY_SEPARATOR . 'bootstrap'
+            . DIRECTORY_SEPARATOR . 'cache';
+
+        // Remove write permission so the cache file cannot be unlinked.
+        chmod($cacheDir, 0555);
+
+        $app = new Application($this->tempDir);
+
+        $command = new ModuleClearCommand;
+        $command->setLaravel($app);
+
+        $output = new BufferedOutput;
+
+        try {
+            $exitCode = $command->run(new ArrayInput([]), $output);
+        } finally {
+            chmod($cacheDir, 0755);
+        }
+
+        self::assertSame(ModuleClearCommand::FAILURE, $exitCode);
+        self::assertStringContainsString('Failed to clear', $output->fetch());
     }
 }

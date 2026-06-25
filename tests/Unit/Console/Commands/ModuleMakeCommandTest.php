@@ -7,12 +7,14 @@ namespace Tests\Unit\Console\Commands;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleMakeCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\Support\Concerns\InteractsWithModules;
 use Tests\Support\Concerns\ManagesTemporaryFiles;
+use Tests\Support\Spies\FailingFilesystem;
 use Tests\Support\Spies\RecordingFilesystem;
 
 /**
@@ -196,6 +198,61 @@ final class ModuleMakeCommandTest extends TestCase
         $this->runMakeCommand('billing');
 
         self::assertStringContainsString('Module [Billing] already exists', $this->output);
+    }
+
+    /**
+     * Test that handle reports an error and returns FAILURE when the scaffold
+     * cannot be written to disk.
+     *
+     * @return void
+     */
+    public function testHandleReturnsFailureWhenScaffoldingFails(): void
+    {
+        $app = new Application($this->tempDir);
+        $app->instance(Filesystem::class, new FailingFilesystem);
+
+        $command = new ModuleMakeCommand;
+        $command->setLaravel($app);
+
+        $output = new BufferedOutput;
+
+        $exitCode = $command->run(new ArrayInput(['name' => 'billing']), $output);
+
+        $body = $output->fetch();
+
+        self::assertSame(ModuleMakeCommand::FAILURE, $exitCode);
+        self::assertStringContainsString('Failed to create module [Billing]: Simulated filesystem failure', $body);
+    }
+
+    /**
+     * Provide invalid module names that must be rejected before scaffolding.
+     *
+     * @return iterable<string, array{string}>
+     */
+    public static function invalidModuleNameProvider(): iterable
+    {
+        yield from [
+            'parent traversal'   => ['../../evil'],
+            'embedded separator' => ['Billing/../secrets'],
+        ];
+    }
+
+    /**
+     * Test that handle rejects a module name that would escape the modules
+     * directory, writing nothing and not attempting to scaffold.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    #[DataProvider('invalidModuleNameProvider')]
+    public function testHandleRejectsInvalidModuleName(string $name): void
+    {
+        $exitCode = $this->runMakeCommand($name);
+
+        self::assertSame(1, $exitCode);
+        self::assertStringContainsString('Invalid module name', $this->output);
+        self::assertStringNotContainsString('Failed to create', $this->output);
+        self::assertSame([], $this->filesystem->writes);
     }
 
     /**

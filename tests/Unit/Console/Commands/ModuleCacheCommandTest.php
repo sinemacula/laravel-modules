@@ -125,4 +125,34 @@ final class ModuleCacheCommandTest extends TestCase
         self::assertSame(ModuleCacheCommand::FAILURE, $exitCode);
         self::assertStringContainsString('Failed to write', $output->fetch());
     }
+
+    /**
+     * Test that handle reports a clean error and returns FAILURE when the
+     * modules directory cannot be read.
+     *
+     * @return void
+     */
+    public function testHandleReturnsFailureWhenModulesDirectoryUnreadable(): void
+    {
+        $modulesDir = $this->tempDir . DIRECTORY_SEPARATOR . 'modules';
+
+        // Remove read permission so module discovery cannot open the directory.
+        chmod($modulesDir, 0000);
+
+        $app = new Application($this->tempDir);
+
+        $command = new ModuleCacheCommand;
+        $command->setLaravel($app);
+
+        $output = new BufferedOutput;
+
+        try {
+            $exitCode = $command->run(new ArrayInput([]), $output);
+        } finally {
+            chmod($modulesDir, 0755);
+        }
+
+        self::assertSame(ModuleCacheCommand::FAILURE, $exitCode);
+        self::assertStringContainsString('Failed to read the modules directory', $output->fetch());
+    }
 }

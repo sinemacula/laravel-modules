@@ -24,12 +24,19 @@ final class ModuleClearCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function handle(): void
+    public function handle(): int
     {
-        Modules::clearCache();
+        if (!Modules::clearCache()) {
+
+            $this->components->error('Failed to clear the cached modules.');
+
+            return self::FAILURE;
+        }
 
         $this->components->info('Cached modules cleared successfully.');
+
+        return self::SUCCESS;
     }
 }

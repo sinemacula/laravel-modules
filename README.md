@@ -149,15 +149,26 @@ Laravel - the package just saves you from listing each module's route file by ha
 ## Requirements
 
 - PHP ^8.3
-- Laravel ^13.0
+- Laravel ^12.0 || ^13.0
 
 ## Testing
 
 ```bash
-composer test
-composer test-coverage
-composer check
+composer test                # PHPUnit suite in parallel via Paratest
+composer test:coverage       # suite with Clover coverage output
+composer test:mutation       # Infection mutation gate (min MSI 90)
+composer test:mutation:full  # full mutation suite without thresholds
+composer check               # static analysis and lint via qlty
+composer format              # format via qlty
+composer smells              # duplication / complexity smells via qlty
+composer bench               # PHPBench suite for the hot paths
+composer bench:ci            # PHPBench with CI artifact dump
+composer bench:smoke         # single-rev pass to verify every subject runs
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of notable changes.
 
 ## Contributing
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/sinemacula/laravel-modules/compare/v1.0.2...v1.1.0) (2026-06-27)
+
+
+### Features
+
+* support Laravel 12 alongside Laravel 13 ([#15](https://github.com/sinemacula/laravel-modules/issues/15)) ([a7a6a52](https://github.com/sinemacula/laravel-modules/commit/a7a6a52fd48929dc25d9d398c88e1158a39c4369))
+
 ## [1.0.2](https://github.com/sinemacula/laravel-modules/compare/v1.0.1...v1.0.2) (2026-06-25)
 
 

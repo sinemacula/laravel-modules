@@ -9,9 +9,9 @@ use Illuminate\Filesystem\Filesystem;
 /**
  * Filesystem double that fails on directory creation.
  *
- * Simulates an unwritable target (permissions, read-only mount) so the
- * scaffold error path in ModuleMakeCommand can be exercised without depending
- * on real filesystem permissions.
+ * Simulates an unwritable target (permissions, read-only mount) so the scaffold
+ * error path in ModuleMakeCommand can be exercised without depending on real
+ * filesystem permissions.
  *
  * @internal
  *

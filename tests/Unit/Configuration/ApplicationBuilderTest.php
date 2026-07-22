@@ -300,8 +300,8 @@ final class ApplicationBuilderTest extends TestCase
     }
 
     /**
-     * Create a spy builder that captures the arguments passed to withEvents
-     * and withCommands.
+     * Create a spy builder that captures the arguments passed to withEvents and
+     * withCommands.
      *
      * @param  \Illuminate\Foundation\Application  $app
      * @return \Tests\Support\Spies\SpyApplicationBuilder

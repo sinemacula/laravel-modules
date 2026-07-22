@@ -97,8 +97,8 @@ final class ModulesTest extends TestCase
     }
 
     /**
-     * Test that modulesPath throws a ModuleException when the base path has
-     * not been set.
+     * Test that modulesPath throws a ModuleException when the base path has not
+     * been set.
      *
      * @return void
      */
@@ -376,8 +376,8 @@ final class ModulesTest extends TestCase
     }
 
     /**
-     * Test that resourcePath normalises a mixed-case module prefix to
-     * lowercase before resolving.
+     * Test that resourcePath normalises a mixed-case module prefix to lowercase
+     * before resolving.
      *
      * @return void
      */
@@ -402,8 +402,8 @@ final class ModulesTest extends TestCase
     {
         Modules::setBasePath($this->tempDir);
 
-        // The default module is 'foundation', which does not
-        // exist in our temp structure, so should return empty
+        // The default module is 'foundation', which does not exist in our temp
+        // structure, so should return empty
         $path = Modules::resourcePath('some/path');
 
         self::assertSame('', $path);
@@ -705,18 +705,18 @@ final class ModulesTest extends TestCase
 
         $routes = Modules::routePaths();
 
-        // The cached_module key should be present instead of
-        // alpha/beta from discovery
+        // The cached_module key should be present instead of alpha/beta from
+        // discovery
         self::assertArrayNotHasKey('alpha', $routes);
         self::assertArrayNotHasKey('beta', $routes);
 
-        // The cached_module does not have routes.php, so it
-        // should be filtered out, but the key should have been
-        // attempted - confirming cache was used
+        // The cached_module does not have routes.php, so it should be filtered
+        // out, but the key should have been attempted - confirming cache was
+        // used
         $views = Modules::viewPaths();
 
-        // Verify that 'alpha' (from discovery) is NOT present,
-        // confirming cache was used
+        // Verify that 'alpha' (from discovery) is NOT present, confirming cache
+        // was used
         self::assertArrayNotHasKey('alpha', $views);
     }
 
@@ -950,8 +950,8 @@ final class ModulesTest extends TestCase
             true,
         );
 
-        // The cache() call must flush primed state before writing discovery,
-        // so the subsequent read reflects epsilon.
+        // The cache() call must flush primed state before writing discovery, so
+        // the subsequent read reflects epsilon.
         Modules::cache();
 
         self::assertArrayHasKey('epsilon', Modules::viewPaths());

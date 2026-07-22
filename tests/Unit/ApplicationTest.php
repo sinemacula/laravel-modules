@@ -255,8 +255,8 @@ final class ApplicationTest extends TestCase
     }
 
     /**
-     * Test that path() uses appPath when it has been explicitly set, instead
-     * of falling back to basePath/modules.
+     * Test that path() uses appPath when it has been explicitly set, instead of
+     * falling back to basePath/modules.
      *
      * @return void
      */

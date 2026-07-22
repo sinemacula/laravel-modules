@@ -14,8 +14,8 @@ use Tests\TestCase;
 /**
  * Feature tests for the module cache and clear commands.
  *
- * These tests share a single file to prevent parallel runner race conditions
- * on the shared bootstrap/cache/modules.php file.
+ * These tests share a single file to prevent parallel runner race conditions on
+ * the shared bootstrap/cache/modules.php file.
  *
  * @author      Ben Carey <bdmc@sinemacula.co.uk>
  * @copyright   2026 Sine Macula Limited

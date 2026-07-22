@@ -90,8 +90,8 @@ final class ModuleCacheCommandTest extends TestCase
     }
 
     /**
-     * Test that handle reports a clean error and returns FAILURE when the
-     * cache cannot be written.
+     * Test that handle reports a clean error and returns FAILURE when the cache
+     * cannot be written.
      *
      * @return void
      */

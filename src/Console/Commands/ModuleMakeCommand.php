@@ -93,7 +93,7 @@ final class ModuleMakeCommand extends Command
                 $modulePath . DIRECTORY_SEPARATOR . 'Http' . DIRECTORY_SEPARATOR . 'routes.php',
                 "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n",
             );
-        } catch (\Throwable $exception) {
+        } catch (\Throwable $exception) { // @phpstan-ignore catch.neverThrown
 
             $this->components->error("Failed to create module [{$name}]: " . $exception->getMessage());
 

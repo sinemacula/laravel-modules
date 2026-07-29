@@ -89,8 +89,6 @@ final class Modules
      * Clear the cached application modules.
      *
      * @return bool true when no cache file remains after the operation
-     *
-     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function clearCache(): bool
     {

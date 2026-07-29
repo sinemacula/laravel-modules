@@ -75,6 +75,8 @@ final class ModuleMakeCommandTest extends TestCase
      * Test that handle creates the module directory structure.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleCreatesModuleStructure(): void
     {
@@ -95,6 +97,8 @@ final class ModuleMakeCommandTest extends TestCase
      * expected path.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleWritesGitkeepFilesToEachDirectory(): void
     {
@@ -115,6 +119,8 @@ final class ModuleMakeCommandTest extends TestCase
      * with the expected content.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleWritesRoutesFileWithExpectedContent(): void
     {
@@ -138,6 +144,8 @@ final class ModuleMakeCommandTest extends TestCase
      * Test that handle converts the name to StudlyCase.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleConvertsNameToStudlyCase(): void
     {
@@ -152,6 +160,8 @@ final class ModuleMakeCommandTest extends TestCase
      * Test that handle returns FAILURE when the module already exists.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleFailsWhenModuleExists(): void
     {
@@ -166,6 +176,8 @@ final class ModuleMakeCommandTest extends TestCase
      * Test that handle returns SUCCESS when the module is created.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleReturnsSuccessOnCreation(): void
     {
@@ -178,6 +190,8 @@ final class ModuleMakeCommandTest extends TestCase
      * Test that handle outputs the success message when the module is created.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleOutputsSuccessMessageOnCreation(): void
     {
@@ -190,6 +204,8 @@ final class ModuleMakeCommandTest extends TestCase
      * Test that handle outputs an error message when the module already exists.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleOutputsErrorWhenModuleExists(): void
     {
@@ -205,6 +221,8 @@ final class ModuleMakeCommandTest extends TestCase
      * cannot be written to disk.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleReturnsFailureWhenScaffoldingFails(): void
     {
@@ -243,6 +261,8 @@ final class ModuleMakeCommandTest extends TestCase
      *
      * @param  string  $name
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     #[DataProvider('invalidModuleNameProvider')]
     public function testHandleRejectsInvalidModuleName(string $name): void
@@ -260,6 +280,8 @@ final class ModuleMakeCommandTest extends TestCase
      *
      * @param  string  $name
      * @return int
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     private function runMakeCommand(string $name): int
     {

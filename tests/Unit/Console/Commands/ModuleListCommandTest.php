@@ -62,6 +62,8 @@ final class ModuleListCommandTest extends TestCase
      * Test that handle outputs a table with column headers when modules exist.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleOutputsTableWithHeaders(): void
     {
@@ -80,6 +82,8 @@ final class ModuleListCommandTest extends TestCase
      * Test that handle outputs all discovered modules in the table.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleOutputsAllDiscoveredModules(): void
     {
@@ -100,6 +104,8 @@ final class ModuleListCommandTest extends TestCase
      * from the path column (which also contains the name as a substring).
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleRendersModuleNamesInOwnColumn(): void
     {
@@ -119,6 +125,8 @@ final class ModuleListCommandTest extends TestCase
      * Test that handle outputs a warning when no modules exist.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleOutputsWarningWhenNoModules(): void
     {
@@ -131,6 +139,8 @@ final class ModuleListCommandTest extends TestCase
      * Test that handle does not render a table when no modules exist.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleDoesNotRenderTableWhenNoModules(): void
     {
@@ -144,6 +154,8 @@ final class ModuleListCommandTest extends TestCase
      * Run the module:list command and return the output.
      *
      * @return string
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     private function runListCommand(): string
     {

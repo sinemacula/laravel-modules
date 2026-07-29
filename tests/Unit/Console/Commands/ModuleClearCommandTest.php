@@ -62,6 +62,8 @@ final class ModuleClearCommandTest extends TestCase
      * Test that handle clears the module cache.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleClearsCache(): void
     {
@@ -90,6 +92,8 @@ final class ModuleClearCommandTest extends TestCase
      * cannot be removed.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleReturnsFailureWhenCacheCannotBeCleared(): void
     {

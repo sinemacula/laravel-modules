@@ -64,6 +64,8 @@ final class ModuleCacheCommandTest extends TestCase
      * Test that handle caches the modules and outputs the success message.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleCachesModules(): void
     {
@@ -94,6 +96,8 @@ final class ModuleCacheCommandTest extends TestCase
      * cannot be written.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleReturnsFailureWhenCacheWriteFails(): void
     {
@@ -131,6 +135,8 @@ final class ModuleCacheCommandTest extends TestCase
      * modules directory cannot be read.
      *
      * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
      */
     public function testHandleReturnsFailureWhenModulesDirectoryUnreadable(): void
     {

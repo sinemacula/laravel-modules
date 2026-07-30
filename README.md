@@ -85,6 +85,15 @@ php artisan optimize        # Includes module:cache
 php artisan optimize:clear  # Includes module:clear
 ```
 
+The cache records the listing of the `modules/` directory it was built from, and is ignored once that listing no
+longer matches. Laravel caches routes and events *before* any package command runs during `optimize`, so without
+this a module added since the last `module:cache` would be missing from the route and event caches while the module
+cache itself looked correct.
+
+Validation covers the immediate entries of `modules/` only, not the contents of each module. Adding or removing a
+module invalidates the cache; editing a file inside one does not. Any entry appearing or disappearing counts, so a
+stray file such as `.DS_Store` also sends the next boot down the discovery path until `module:cache` runs again.
+
 ## Installation
 
 ```bash

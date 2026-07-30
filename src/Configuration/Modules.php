@@ -59,20 +59,7 @@ final class Modules
     {
         self::flush();
 
-        $content   = "<?php\nreturn " . var_export(self::discoverModules(), true) . ';';
-        $cachePath = self::cachePath();
-        $tempPath  = $cachePath . '.tmp';
-
-        if (file_put_contents($tempPath, $content) === false) {
-            throw new ModuleException('Failed to write temporary cache file at ' . $tempPath . '.');
-        }
-
-        if (!rename($tempPath, $cachePath)) { // @codeCoverageIgnoreStart
-
-            @unlink($tempPath);
-
-            throw new ModuleException('Failed to write cache file at ' . $cachePath . '.');
-        } // @codeCoverageIgnoreEnd
+        self::manifest()->write(static fn (): array => self::discoverModules());
     }
 
     /**
@@ -92,9 +79,7 @@ final class Modules
      */
     public static function clearCache(): bool
     {
-        $path = self::cachePath();
-
-        $cleared = !file_exists($path) || @unlink($path);
+        $cleared = self::manifest()->delete();
 
         self::flush();
 
@@ -187,7 +172,7 @@ final class Modules
      */
     public static function getModules(): array
     {
-        return self::$modules ??= self::loadModulesFromCache() ?? self::discoverModules();
+        return self::$modules ??= self::manifest()->read() ?? self::discoverModules();
     }
 
     /**
@@ -265,13 +250,18 @@ final class Modules
     }
 
     /**
-     * Return the path to the cache file.
+     * Return the manifest for the current base path.
      *
-     * @return string
+     * @return \SineMacula\Laravel\Modules\Configuration\ModuleManifest
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
-    private static function cachePath(): string
+    private static function manifest(): ModuleManifest
     {
-        return self::buildPath(ModulePath::CACHE->value);
+        return new ModuleManifest(
+            self::buildPath(ModulePath::CACHE->value),
+            self::modulesPath(),
+        );
     }
 
     /**
@@ -320,24 +310,5 @@ final class Modules
             array_map('realpath', $paths),
             static fn (false|string $path): bool => $path !== false,
         );
-    }
-
-    /**
-     * Attempt to load the modules from the cache.
-     *
-     * @return array<string, string>|null
-     *
-     * @SuppressWarnings("php:S4833")
-     * @SuppressWarnings("php:S2003")
-     */
-    private static function loadModulesFromCache(): ?array
-    {
-        if (!file_exists(self::cachePath())) {
-            return null;
-        }
-
-        $modules = require self::cachePath();
-
-        return is_array($modules) ? $modules : null; // @phpstan-ignore return.type (require() of the cache file yields mixed; the is_array guard validates the shape)
     }
 }

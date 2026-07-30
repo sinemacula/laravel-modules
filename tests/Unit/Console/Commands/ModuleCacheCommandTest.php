@@ -85,10 +85,10 @@ final class ModuleCacheCommandTest extends TestCase
 
         self::assertFileExists($cachePath);
 
-        $modules = require $cachePath;
+        $manifest = require $cachePath;
 
-        self::assertIsArray($modules);
-        self::assertArrayHasKey('alpha', $modules);
+        self::assertIsArray($manifest);
+        self::assertArrayHasKey('alpha', $manifest['modules']);
     }
 
     /**

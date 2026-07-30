@@ -32,6 +32,10 @@ trait ManagesTemporaryFiles
             . $prefix . uniqid();
 
         mkdir($this->tempDir, 0755, true);
+
+        // Modules canonicalises its base path, and the macOS temp root is
+        // itself a symlink.
+        $this->tempDir = realpath($this->tempDir) ?: $this->tempDir;
     }
 
     /**

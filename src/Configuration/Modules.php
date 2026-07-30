@@ -40,12 +40,30 @@ final class Modules
     /**
      * Set the base path for the module resolver.
      *
+     * The path is canonicalised where it resolves, so a symlinked or
+     * trailing-slash form agrees with the canonical paths returned by
+     * discovery. Memoised state is discarded whenever the resolved path
+     * changes; setting the same path again is a no-op. Paths already handed to
+     * the application builder are not revisited.
+     *
      * @param  string  $path
      * @return void
      */
     public static function setBasePath(string $path): void
     {
+        // realpath('') resolves to the working directory rather than failing,
+        // so an empty path is kept as given.
+        if ($path !== '') {
+            $path = realpath($path) ?: $path;
+        }
+
+        if ((self::$basePath ?? null) === $path) {
+            return;
+        }
+
         self::$basePath = $path;
+
+        self::flush();
     }
 
     /**

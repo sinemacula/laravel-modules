@@ -186,11 +186,24 @@ final class Modules
     /**
      * Return an array of each of the module paths.
      *
+     * The map is ordered by module name so that route precedence, command
+     * registration and listing output do not depend on the order in which the
+     * filesystem happens to return directory entries.
+     *
      * @return array<string, string>
      */
     public static function getModules(): array
     {
-        return self::$modules ??= self::manifest()->read() ?? self::discoverModules();
+        if (self::$modules === null) {
+
+            self::$modules = self::manifest()->read() ?? self::discoverModules();
+
+            // Byte-wise, so the order cannot shift with the process locale or
+            // with directory names that compare equal numerically.
+            ksort(self::$modules, SORT_STRING);
+        }
+
+        return self::$modules;
     }
 
     /**

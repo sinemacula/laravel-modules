@@ -173,6 +173,42 @@ final class ModuleMakeCommandTest extends TestCase
     }
 
     /**
+     * Test that a module can be scaffolded before the modules directory itself
+     * exists.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
+     */
+    public function testHandleScaffoldsWhenTheModulesDirectoryIsAbsent(): void
+    {
+        rmdir($this->tempDir . DIRECTORY_SEPARATOR . 'modules');
+
+        $exitCode = $this->runMakeCommand('billing');
+
+        self::assertSame(0, $exitCode);
+        self::assertDirectoryExists($this->modulePath('Billing') . '/Models');
+    }
+
+    /**
+     * Test that a module whose name differs only by case is treated as an
+     * existing module, since discovery keys them identically.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
+     */
+    public function testHandleFailsWhenADifferentlyCasedModuleExists(): void
+    {
+        $this->createDirectory('modules/billing');
+
+        $exitCode = $this->runMakeCommand('Billing');
+
+        self::assertSame(1, $exitCode);
+        self::assertStringContainsString('already exists', $this->output);
+    }
+
+    /**
      * Test that handle returns SUCCESS when the module is created.
      *
      * @return void

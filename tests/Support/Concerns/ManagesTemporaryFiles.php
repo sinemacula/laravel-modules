@@ -114,10 +114,13 @@ trait ManagesTemporaryFiles
         );
 
         foreach ($items as $item) {
-            if ($item->isDir()) {
-                rmdir($item->getRealPath());
+
+            // Remove the entry itself rather than whatever it points at, so a
+            // symlink does not take its target with it.
+            if ($item->isDir() && !$item->isLink()) {
+                rmdir($item->getPathname());
             } else {
-                unlink($item->getRealPath());
+                unlink($item->getPathname());
             }
         }
 

@@ -59,6 +59,60 @@ final class ModuleListCommandTest extends TestCase
     }
 
     /**
+     * Test that a discovery failure is reported and exits with a failure code
+     * rather than escaping as an uncaught exception.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
+     */
+    public function testHandleReportsDiscoveryFailure(): void
+    {
+        $target = $this->tempDir . '/outside/Remote';
+
+        mkdir($target, 0755, true);
+        symlink($target, $this->tempDir . '/modules/remote');
+
+        $this->resetModulesState();
+        Modules::setBasePath($this->tempDir);
+
+        $app = new Application($this->tempDir);
+
+        $command = new ModuleListCommand;
+        $command->setLaravel($app);
+
+        $output   = new BufferedOutput;
+        $exitCode = $command->run(new ArrayInput([]), $output);
+
+        self::assertSame(ModuleListCommand::FAILURE, $exitCode);
+        self::assertStringContainsString('does not resolve to a real directory', $output->fetch());
+    }
+
+    /**
+     * Test that a successful listing exits with a success code.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
+     */
+    public function testHandleReturnsSuccessWhenModulesAreListed(): void
+    {
+        $this->createDirectory('modules/alpha');
+
+        $this->resetModulesState();
+        Modules::setBasePath($this->tempDir);
+
+        $app = new Application($this->tempDir);
+
+        $command = new ModuleListCommand;
+        $command->setLaravel($app);
+
+        $exitCode = $command->run(new ArrayInput([]), new BufferedOutput);
+
+        self::assertSame(ModuleListCommand::SUCCESS, $exitCode);
+    }
+
+    /**
      * Test that handle outputs a table with column headers when modules exist.
      *
      * @return void

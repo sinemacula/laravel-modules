@@ -62,6 +62,34 @@ final class ModuleMakeCommand extends Command
     }
 
     /**
+     * Determine whether a module with the given name already exists.
+     *
+     * Discovery keys modules by their lowercased name, so a differently cased
+     * sibling would collide on a case-sensitive filesystem. The modules
+     * directory is scanned directly rather than resolved, because a cached
+     * manifest can predate the module being checked for.
+     *
+     * @param  \Illuminate\Filesystem\Filesystem  $filesystem
+     * @param  string  $modulesPath
+     * @param  string  $name
+     * @return bool
+     */
+    private function hasModuleNamed(Filesystem $filesystem, string $modulesPath, string $name): bool
+    {
+        if (!$filesystem->isDirectory($modulesPath)) {
+            return false;
+        }
+
+        foreach ($filesystem->directories($modulesPath) as $directory) {
+            if (strtolower(basename($directory)) === strtolower($name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Scaffold the module directory structure on disk.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $filesystem
@@ -70,9 +98,10 @@ final class ModuleMakeCommand extends Command
      */
     private function scaffold(Filesystem $filesystem, string $name): int
     {
-        $modulePath = Modules::modulesPath() . DIRECTORY_SEPARATOR . $name;
+        $modulesPath = Modules::modulesPath();
+        $modulePath  = $modulesPath . DIRECTORY_SEPARATOR . $name;
 
-        if ($filesystem->isDirectory($modulePath)) {
+        if ($this->hasModuleNamed($filesystem, $modulesPath, $name)) {
 
             $this->components->error("Module [{$name}] already exists.");
 

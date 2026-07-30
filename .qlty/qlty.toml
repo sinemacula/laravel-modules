@@ -124,3 +124,10 @@ success_codes = [0, 1, 2, 3]
 [[exclude]]
 plugins = ["radarlint-php"]
 file_patterns = ["benchmarks/**", "tests/**"]
+
+# The end-to-end fixture is a miniature consumer application checked in as test
+# data. It follows Laravel's application conventions rather than this package's
+# own standard, so the PHP style and analysis plugins skip it.
+[[exclude]]
+plugins = ["php-codesniffer", "php-cs-fixer", "phpstan"]
+file_patterns = ["tests/Fixtures/**"]

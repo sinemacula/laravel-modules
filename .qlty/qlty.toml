@@ -80,6 +80,8 @@ version = "3.89.0"
 [[plugin]]
 name = "phpstan"
 version = "2.1.46"
+package_file = ".qlty/configs/composer.json"
+package_filters = ["phpstan", "larastan", "sinemacula"]
 
 [[plugin]]
 name = "radarlint-php"
@@ -98,16 +100,14 @@ name = "trufflehog"
 [[plugin]]
 name = "yamllint"
 
-# phpstan + larastan need the project's dependencies installed so larastan can
-# bootstrap the application and resolve framework symbols. package_file alone
-# does not run a full install, so install them via a prepare script. composer
-# install resolves from composer.json when no lockfile is committed (this is a
-# library, so composer.lock is not tracked). Ignore only extension reqs (qlty's
-# runner may lack some) but NOT the PHP version: a blanket --ignore-platform-reqs
-# lets the PHP 8.3 runner pull symfony 8 (8.4-only syntax) and larastan's
-# bootstrap then dies. Do not remove.
+# phpstan resolves framework symbols by autoloading the package's own
+# dependencies, which a bare checkout does not have, so install them first.
+# COMPOSER_VENDOR_DIR is pinned to the repository's vendor directory because
+# the plugin environment points it at the shared phpstan tool sandbox, where an
+# install would replace the pinned analysis stack. Only extension requirements
+# are ignored so the PHP version constraint still applies.
 [plugins.definitions.phpstan.drivers.lint]
-prepare_script = "~/.qlty/cache/tools/composer/generic-42cc848a9f5e/composer.phar install --no-scripts --ignore-platform-req='ext-*'"
+prepare_script = "COMPOSER_VENDOR_DIR=vendor ~/.qlty/cache/tools/composer/generic-42cc848a9f5e/composer.phar install --no-scripts --ignore-platform-req='ext-*'"
 
 # php-codesniffer 4.x exits with code 3 when it finds issues; qlty's default
 # success codes are [0, 1], so without this qlty treats a normal "issues found"

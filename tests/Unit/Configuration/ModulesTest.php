@@ -82,6 +82,93 @@ final class ModulesTest extends TestCase
     }
 
     /**
+     * Test that changing the base path discards module state resolved against
+     * the previous one.
+     *
+     * @return void
+     */
+    public function testSetBasePathDiscardsStateWhenThePathChanges(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        self::assertArrayHasKey('alpha', Modules::getModules());
+
+        $other = $this->tempDir . DIRECTORY_SEPARATOR . 'other';
+
+        mkdir($other . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . 'omega', 0755, true);
+
+        Modules::setBasePath($other);
+
+        $modules = Modules::getModules();
+
+        self::assertArrayHasKey('omega', $modules);
+        self::assertArrayNotHasKey('alpha', $modules);
+    }
+
+    /**
+     * Test that setting the same base path again keeps the memoised state, so
+     * the resolver is not a refresh hook.
+     *
+     * @return void
+     */
+    public function testSetBasePathKeepsStateWhenThePathIsUnchanged(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        $before = Modules::getModules();
+
+        mkdir($this->tempDir . '/modules/omega', 0755, true);
+
+        Modules::setBasePath($this->tempDir);
+
+        self::assertSame($before, Modules::getModules());
+    }
+
+    /**
+     * Test that a base path given in a non-canonical form resolves to the same
+     * value as its canonical form.
+     *
+     * @return void
+     */
+    public function testSetBasePathCanonicalisesTheGivenPath(): void
+    {
+        Modules::setBasePath($this->tempDir . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . '..');
+
+        self::assertSame(
+            $this->tempDir . DIRECTORY_SEPARATOR . 'modules',
+            Modules::modulesPath(),
+        );
+    }
+
+    /**
+     * Test that a base path which cannot be resolved is kept exactly as given.
+     *
+     * @return void
+     */
+    public function testSetBasePathKeepsUnresolvablePathsAsGiven(): void
+    {
+        Modules::setBasePath('/no/such/directory');
+
+        self::assertSame(
+            '/no/such/directory' . DIRECTORY_SEPARATOR . 'modules',
+            Modules::modulesPath(),
+        );
+    }
+
+    /**
+     * Test that an empty base path is kept as given rather than resolving to
+     * the working directory.
+     *
+     * @return void
+     */
+    public function testSetBasePathKeepsAnEmptyPathAsGiven(): void
+    {
+        Modules::setBasePath('');
+
+        self::assertSame(DIRECTORY_SEPARATOR . 'modules', Modules::modulesPath());
+    }
+
+    /**
      * Test that modulesPath returns the base path joined with the modules
      * directory using DIRECTORY_SEPARATOR.
      *

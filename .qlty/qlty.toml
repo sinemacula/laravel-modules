@@ -64,7 +64,7 @@ name = "osv-scanner"
 name = "php-codesniffer"
 version = "4.0.1"
 mode = "comment"
-package_file = "composer.json"
+package_file = ".qlty/configs/composer.json"
 package_filters = ["slevomat", "dealerdirect", "sinemacula"]
 
 # Pinned to the last php-cs-fixer release whose symfony/console stays on the 7.x
@@ -73,7 +73,7 @@ package_filters = ["slevomat", "dealerdirect", "sinemacula"]
 # PHP 8.4.
 [[plugin]]
 name = "php-cs-fixer"
-package_file = "composer.json"
+package_file = ".qlty/configs/composer.json"
 package_filters = ["sinemacula"]
 version = "3.89.0"
 

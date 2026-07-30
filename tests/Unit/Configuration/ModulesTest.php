@@ -7,6 +7,7 @@ namespace Tests\Unit\Configuration;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use SineMacula\Laravel\Modules\Configuration\ModuleManifest;
 use SineMacula\Laravel\Modules\Configuration\Modules;
 use SineMacula\Laravel\Modules\Exceptions\ModuleException;
 use Tests\Support\Concerns\InteractsWithModules;
@@ -130,11 +131,13 @@ final class ModulesTest extends TestCase
 
         self::assertFileExists($cachePath);
 
-        $modules = require $cachePath;
+        $manifest = require $cachePath;
 
-        self::assertIsArray($modules);
-        self::assertArrayHasKey('alpha', $modules);
-        self::assertArrayHasKey('beta', $modules);
+        self::assertIsArray($manifest);
+        self::assertIsString($manifest['signature']);
+        self::assertIsArray($manifest['modules']);
+        self::assertArrayHasKey('alpha', $manifest['modules']);
+        self::assertArrayHasKey('beta', $manifest['modules']);
     }
 
     /**
@@ -151,7 +154,7 @@ final class ModulesTest extends TestCase
         Modules::setBasePath(dirname($cacheDir, 2));
 
         $this->expectException(ModuleException::class);
-        $this->expectExceptionMessage('Failed to write temporary cache file at ' . $cachePath . '.tmp.');
+        $this->expectExceptionMessage('Failed to write temporary manifest file at ' . $cachePath . '.tmp.');
 
         // Suppress the file_put_contents warning so PHPUnit sees the exception.
         set_error_handler(static fn (): bool => true);
@@ -186,10 +189,10 @@ final class ModulesTest extends TestCase
             . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'modules.php';
 
-        $modules = require $cachePath;
+        $manifest = require $cachePath;
 
-        self::assertArrayHasKey('alpha', $modules);
-        self::assertArrayHasKey('beta', $modules);
+        self::assertArrayHasKey('alpha', $manifest['modules']);
+        self::assertArrayHasKey('beta', $manifest['modules']);
     }
 
     /**
@@ -697,11 +700,8 @@ final class ModulesTest extends TestCase
             . DIRECTORY_SEPARATOR . 'cache'
             . DIRECTORY_SEPARATOR . 'modules.php';
 
-        $content = "<?php\nreturn "
-            . var_export(['cached_module' => $fakePath], true)
-            . ';';
-
-        file_put_contents($cachePath, $content);
+        (new ModuleManifest($cachePath, $this->tempDir . DIRECTORY_SEPARATOR . 'modules'))
+            ->write(static fn (): array => ['cached_module' => $fakePath]);
 
         $routes = Modules::routePaths();
 

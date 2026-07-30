@@ -38,11 +38,11 @@ final class CachedModuleBootTest extends ModuleIntegrationTestCase
             $this->fixtureAppPath . '/bootstrap/cache/modules.php',
         );
 
-        $cached = require $this->fixtureAppPath . '/bootstrap/cache/modules.php';
+        $manifest = require $this->fixtureAppPath . '/bootstrap/cache/modules.php';
 
-        self::assertIsArray($cached);
-        self::assertArrayHasKey('billing', $cached);
-        self::assertArrayHasKey('reporting', $cached);
+        self::assertIsArray($manifest);
+        self::assertArrayHasKey('billing', $manifest['modules']);
+        self::assertArrayHasKey('reporting', $manifest['modules']);
     }
 
     /**

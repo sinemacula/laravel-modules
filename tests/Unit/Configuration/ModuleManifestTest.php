@@ -211,6 +211,29 @@ final class ModuleManifestTest extends TestCase
     }
 
     /**
+     * Test that a manifest containing a non-string module path is discarded.
+     *
+     * Resolution concatenates the stored paths, so a non-string value would
+     * otherwise raise a conversion warning on every request.
+     *
+     * @return void
+     */
+    public function testReadReturnsNullWhenAModulePathIsNotAString(): void
+    {
+        $signature = implode("\n", [$this->modulesPath, ...(array) scandir($this->modulesPath)]);
+
+        file_put_contents(
+            $this->manifestPath,
+            "<?php\nreturn " . var_export([
+                'signature' => $signature,
+                'modules'   => ['alpha' => '/somewhere/alpha', 'beta' => ['nested']],
+            ], true) . ';',
+        );
+
+        self::assertNull($this->manifest()->read());
+    }
+
+    /**
      * Test that a manifest that is not an array at all is discarded.
      *
      * @return void

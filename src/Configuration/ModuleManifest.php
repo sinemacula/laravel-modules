@@ -133,11 +133,18 @@ final readonly class ModuleManifest
 
         $manifest = require $this->path;
 
-        if (!is_array($manifest) || !isset($manifest['modules'], $manifest['signature'])) {
+        // Paths are concatenated during resolution, so a non-string value would
+        // otherwise raise a conversion warning on every request.
+        if (
+            !is_array($manifest)
+            || !isset($manifest['modules'], $manifest['signature'])
+            || !is_array($manifest['modules'])
+            || array_filter($manifest['modules'], 'is_string') !== $manifest['modules']
+        ) {
             return null;
         }
 
-        return is_array($manifest['modules']) ? $manifest : null; // @phpstan-ignore return.type (require() of the manifest yields mixed; the guards above validate the shape)
+        return $manifest; // @phpstan-ignore return.type (require() of the manifest yields mixed; the guards above validate the shape)
     }
 
     /**

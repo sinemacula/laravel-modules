@@ -82,6 +82,77 @@ final class ModulesTest extends TestCase
     }
 
     /**
+     * Test that discovered modules are returned in name order rather than the
+     * order the filesystem happens to yield.
+     *
+     * @return void
+     */
+    public function testGetModulesIsOrderedByName(): void
+    {
+        foreach (['Zeta', 'Mu', 'Kappa', 'Delta', 'Omega', 'Gamma'] as $module) {
+            mkdir($this->tempDir . '/modules/' . $module, 0755, true);
+        }
+
+        Modules::setBasePath($this->tempDir);
+
+        $discovered = array_keys(Modules::getModules());
+
+        $expected = $discovered;
+        sort($expected, SORT_STRING);
+
+        self::assertSame($expected, $discovered);
+        self::assertSame('alpha', $discovered[0]);
+        self::assertSame('zeta', $discovered[count($discovered) - 1]);
+    }
+
+    /**
+     * Test that a cache written in filesystem order is ordered on read, so the
+     * ordering applies without re-running module:cache.
+     *
+     * @return void
+     */
+    public function testCachedModulesAreOrderedOnRead(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        $unsorted = ['zeta' => $this->tempDir, 'alpha' => $this->tempDir, 'mu' => $this->tempDir];
+
+        (new ModuleManifest(
+            $this->tempDir . '/bootstrap/cache/modules.php',
+            $this->tempDir . DIRECTORY_SEPARATOR . 'modules',
+        ))->write(static fn (): array => $unsorted);
+
+        self::assertSame(['alpha', 'mu', 'zeta'], array_keys(Modules::getModules()));
+    }
+
+    /**
+     * Test that module ordering does not shift with the process locale.
+     *
+     * @return void
+     */
+    public function testGetModulesOrderIsIndependentOfLocale(): void
+    {
+        foreach (['zebra', 'apple'] as $module) {
+            mkdir($this->tempDir . '/modules/' . $module, 0755, true);
+        }
+
+        $original = setlocale(LC_COLLATE, '0');
+
+        setlocale(LC_COLLATE, 'C');
+        Modules::setBasePath($this->tempDir);
+        $under = array_keys(Modules::getModules());
+
+        try {
+            setlocale(LC_COLLATE, 'en_US.UTF-8', 'en_US.utf8', 'C');
+            $this->resetModulesState();
+
+            self::assertSame($under, array_keys(Modules::getModules()));
+        } finally {
+            setlocale(LC_COLLATE, is_string($original) ? $original : 'C');
+        }
+    }
+
+    /**
      * Test that changing the base path discards module state resolved against
      * the previous one.
      *

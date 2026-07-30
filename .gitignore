@@ -1,5 +1,7 @@
 /vendor
 /.idea
+/tests/Fixtures/app/bootstrap/cache
+/tests/Fixtures/app/storage
 /build
 /phpunit.xml
 /.phpunit.cache

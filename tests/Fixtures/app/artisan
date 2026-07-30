@@ -1,0 +1,11 @@
+<?php
+
+use Symfony\Component\Console\Input\ArgvInput;
+
+$autoload = getenv('LARAVEL_MODULES_FIXTURE_AUTOLOAD');
+
+require is_string($autoload) && $autoload !== '' ? $autoload : dirname(__DIR__, 3) . '/vendor/autoload.php';
+
+$app = require __DIR__ . '/bootstrap/app.php';
+
+exit($app->handleCommand(new ArgvInput));

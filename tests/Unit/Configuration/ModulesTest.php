@@ -82,6 +82,55 @@ final class ModulesTest extends TestCase
     }
 
     /**
+     * Test that two module directories differing only by case are rejected
+     * rather than one silently replacing the other.
+     *
+     * @return void
+     */
+    public function testDiscoverModulesRejectsDuplicateNames(): void
+    {
+        if (!$this->hasCaseSensitiveModulesDirectory()) {
+            self::markTestSkipped('The filesystem cannot hold two names differing only by case.');
+        }
+
+        mkdir($this->tempDir . '/modules/Alpha', 0755, true);
+
+        Modules::setBasePath($this->tempDir);
+
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage(
+            'Duplicate module name [alpha] in ' . $this->tempDir . DIRECTORY_SEPARATOR . 'modules'
+            . '. Module directory names must be unique regardless of case.',
+        );
+
+        Modules::getModules();
+    }
+
+    /**
+     * Test that a module directory reached through a symlink is rejected, since
+     * its commands and listeners would not register.
+     *
+     * @return void
+     */
+    public function testDiscoverModulesRejectsSymlinkedModuleDirectories(): void
+    {
+        $target = $this->tempDir . '/outside/Remote';
+
+        mkdir($target, 0755, true);
+        symlink($target, $this->tempDir . '/modules/remote');
+
+        Modules::setBasePath($this->tempDir);
+
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage(
+            'Module [remote] in ' . $this->tempDir . DIRECTORY_SEPARATOR . 'modules'
+            . ' does not resolve to a real directory. Symlinked module directories are not supported.',
+        );
+
+        Modules::getModules();
+    }
+
+    /**
      * Test that discovered modules are returned in name order rather than the
      * order the filesystem happens to yield.
      *
@@ -1221,6 +1270,27 @@ final class ModulesTest extends TestCase
 
         // The resolved paths are memoized, so beta must remain absent.
         self::assertArrayNotHasKey('beta', Modules::viewPaths());
+    }
+
+    /**
+     * Determine whether the modules directory can hold two names differing only
+     * by case.
+     *
+     * @return bool
+     */
+    private function hasCaseSensitiveModulesDirectory(): bool
+    {
+        $probe = $this->tempDir . '/modules/CaseProbe';
+
+        if (!@mkdir($probe, 0755, true)) {
+            return false;
+        }
+
+        $sensitive = !is_dir($this->tempDir . '/modules/caseprobe');
+
+        rmdir($probe);
+
+        return $sensitive;
     }
 
     /**

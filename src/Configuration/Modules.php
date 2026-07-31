@@ -191,6 +191,8 @@ final class Modules
      * filesystem happens to return directory entries.
      *
      * @return array<string, string>
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function getModules(): array
     {
@@ -257,7 +259,21 @@ final class Modules
                 continue;
             }
 
-            $modules[strtolower($fileInfo->getFilename())] = $fileInfo->getRealPath();
+            $name = $fileInfo->getFilename();
+            $key  = strtolower($name);
+
+            if (isset($modules[$key])) {
+                throw new ModuleException('Duplicate module name [' . $key . '] in ' . $path . '. Module directory names must be unique regardless of case.');
+            }
+
+            // Laravel derives command and listener class names from each
+            // discovered file's real path, so a module reached through a link
+            // registers its resources but none of its classes.
+            if ($fileInfo->getRealPath() !== $fileInfo->getPathname()) {
+                throw new ModuleException('Module [' . $name . '] in ' . $path . ' does not resolve to a real directory. Symlinked module directories are not supported.');
+            }
+
+            $modules[$key] = $fileInfo->getRealPath();
         }
 
         return $modules;

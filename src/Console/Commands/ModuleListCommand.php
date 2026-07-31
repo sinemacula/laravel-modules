@@ -6,6 +6,7 @@ namespace SineMacula\Laravel\Modules\Console\Commands;
 
 use Illuminate\Console\Command;
 use SineMacula\Laravel\Modules\Configuration\Modules;
+use SineMacula\Laravel\Modules\Exceptions\ModuleException;
 
 /**
  * List all discovered application modules.
@@ -24,17 +25,24 @@ final class ModuleListCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function handle(): void
+    public function handle(): int
     {
-        $modules = Modules::getModules();
+        try {
+            $modules = Modules::getModules();
+        } catch (ModuleException $e) {
+
+            $this->components->error($e->getMessage());
+
+            return self::FAILURE;
+        }
 
         if (empty($modules)) {
 
             $this->components->warn('No modules discovered.');
 
-            return;
+            return self::SUCCESS;
         }
 
         $this->table(
@@ -45,5 +53,7 @@ final class ModuleListCommand extends Command
                 array_keys($modules),
             ),
         );
+
+        return self::SUCCESS;
     }
 }

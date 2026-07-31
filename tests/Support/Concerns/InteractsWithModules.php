@@ -12,8 +12,6 @@ use SineMacula\Laravel\Modules\Configuration\Modules;
  * Handles resetting Modules static state, initialising the base path, and
  * creating module directory structures within a temporary directory.
  *
- * @SuppressWarnings("php:S3011")
- *
  * @author      Ben Carey <bdmc@sinemacula.co.uk>
  * @copyright   2026 Sine Macula Limited
  *
@@ -32,13 +30,7 @@ trait InteractsWithModules
      */
     protected function resetModulesState(): void
     {
-        $reflection = new \ReflectionClass(Modules::class);
-
-        $modules = $reflection->getProperty('modules');
-        $modules->setValue(null, null);
-
-        $resolvedPaths = $reflection->getProperty('resolvedPaths');
-        $resolvedPaths->setValue(null, []);
+        Modules::flush();
     }
 
     /**

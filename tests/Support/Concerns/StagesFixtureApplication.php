@@ -45,7 +45,9 @@ trait StagesFixtureApplication
         // and the macOS temporary root is itself a symlink.
         $this->fixtureAppPath = realpath($path) ?: $path;
 
-        foreach (['bootstrap/cache', 'resources/views', 'storage/framework/views', 'modules'] as $directory) {
+        // No resources/ directory is staged: every fixture view lives inside a
+        // module, and staging one would hide whether optimize runs without it.
+        foreach (['bootstrap/cache', 'storage/framework/views', 'modules'] as $directory) {
             mkdir($this->fixtureAppPath . DIRECTORY_SEPARATOR . $directory, 0755, true);
         }
 

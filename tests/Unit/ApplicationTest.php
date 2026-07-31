@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Tests\Unit;
 
+use Illuminate\Config\Repository as ConfigRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use SineMacula\Laravel\Modules\Application;
@@ -276,6 +277,119 @@ final class ApplicationTest extends TestCase
             $customAppPath . DIRECTORY_SEPARATOR . 'Services',
             $path,
         );
+    }
+
+    /**
+     * Test that viewPath returns the first configured view path.
+     *
+     * @return void
+     */
+    public function testViewPathUsesTheFirstConfiguredPath(): void
+    {
+        $configured = $this->tempDir . DIRECTORY_SEPARATOR . 'configured';
+
+        $app = $this->applicationWithViewPaths([$configured]);
+
+        self::assertSame(
+            $configured . DIRECTORY_SEPARATOR . 'components',
+            $app->viewPath('components'),
+        );
+    }
+
+    /**
+     * Test that viewPath falls back to the module-aware resource path when no
+     * view paths are configured, rather than reading past the end of the list.
+     *
+     * @return void
+     */
+    public function testViewPathFallsBackToTheResourcePathWhenNoneAreConfigured(): void
+    {
+        $app = $this->applicationWithViewPaths([]);
+
+        self::assertSame(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'foundation'
+                . DIRECTORY_SEPARATOR . 'Resources'
+                . DIRECTORY_SEPARATOR . 'views'
+                . DIRECTORY_SEPARATOR . 'components',
+            $app->viewPath('components'),
+        );
+    }
+
+    /**
+     * Test that viewPath falls back to the resource path when the configured
+     * entry is not a string.
+     *
+     * @return void
+     */
+    public function testViewPathFallsBackWhenTheConfiguredPathIsNotAString(): void
+    {
+        $app = $this->applicationWithViewPaths([123]);
+
+        self::assertSame(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'foundation'
+                . DIRECTORY_SEPARATOR . 'Resources'
+                . DIRECTORY_SEPARATOR . 'views',
+            $app->viewPath(),
+        );
+    }
+
+    /**
+     * Test that viewPath falls back to the resource path when the view paths
+     * are absent from the configuration entirely.
+     *
+     * @return void
+     */
+    public function testViewPathFallsBackWhenTheViewPathsAreMissing(): void
+    {
+        $app = new Application($this->tempDir);
+
+        $app->instance('config', new ConfigRepository);
+
+        self::assertSame(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'foundation'
+                . DIRECTORY_SEPARATOR . 'Resources'
+                . DIRECTORY_SEPARATOR . 'views',
+            $app->viewPath(),
+        );
+    }
+
+    /**
+     * Test that viewPath strips a trailing separator from the configured path
+     * so the joined result is not doubled.
+     *
+     * @return void
+     */
+    public function testViewPathStripsATrailingSeparator(): void
+    {
+        $configured = $this->tempDir . DIRECTORY_SEPARATOR . 'configured';
+
+        $app = $this->applicationWithViewPaths([$configured . DIRECTORY_SEPARATOR]);
+
+        self::assertSame(
+            $configured . DIRECTORY_SEPARATOR . 'components',
+            $app->viewPath('components'),
+        );
+    }
+
+    /**
+     * Create an application whose configuration holds the given view paths.
+     *
+     * @param  list<int|string>  $paths
+     * @return \SineMacula\Laravel\Modules\Application
+     */
+    private function applicationWithViewPaths(array $paths): Application
+    {
+        $app = new Application($this->tempDir);
+
+        $app->instance('config', new ConfigRepository(['view' => ['paths' => $paths]]));
+
+        return $app;
     }
 
     /**

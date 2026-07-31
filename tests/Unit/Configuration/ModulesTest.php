@@ -559,6 +559,82 @@ final class ModulesTest extends TestCase
     }
 
     /**
+     * Test that flush discards the memoised module map, so a module added after
+     * the first read is discovered on the next one.
+     *
+     * @return void
+     */
+    public function testFlushDiscardsTheMemoisedModuleMap(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        self::assertArrayNotHasKey('gamma', Modules::getModules());
+
+        mkdir(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'gamma',
+            0755,
+            true,
+        );
+
+        Modules::flush();
+
+        self::assertArrayHasKey('gamma', Modules::getModules());
+    }
+
+    /**
+     * Test that flush discards the resolved path maps as well as the module
+     * map, so a directory created afterwards resolves.
+     *
+     * @return void
+     */
+    public function testFlushDiscardsTheResolvedPathMaps(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        // Beta exists but has no views directory, so it is filtered out.
+        self::assertArrayNotHasKey('beta', Modules::viewPaths());
+
+        mkdir(
+            $this->tempDir
+                . DIRECTORY_SEPARATOR . 'modules'
+                . DIRECTORY_SEPARATOR . 'beta'
+                . DIRECTORY_SEPARATOR . 'Resources'
+                . DIRECTORY_SEPARATOR . 'views',
+            0755,
+            true,
+        );
+
+        Modules::flush();
+
+        self::assertArrayHasKey('beta', Modules::viewPaths());
+    }
+
+    /**
+     * Test that flush leaves the cached manifest on disk, so it discards state
+     * without clearing the cache.
+     *
+     * @return void
+     */
+    public function testFlushLeavesTheCachedManifestInPlace(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        Modules::cache();
+
+        $cachePath = $this->tempDir
+            . DIRECTORY_SEPARATOR . 'bootstrap'
+            . DIRECTORY_SEPARATOR . 'cache'
+            . DIRECTORY_SEPARATOR . 'modules.php';
+
+        Modules::flush();
+
+        self::assertFileExists($cachePath);
+        self::assertSame(['alpha', 'beta'], array_keys(Modules::getModules()));
+    }
+
+    /**
      * Test that discoverModules throws a ModuleException when the modules
      * directory exists but cannot be read.
      *

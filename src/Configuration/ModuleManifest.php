@@ -120,8 +120,12 @@ final readonly class ModuleManifest
     /**
      * Load the manifest file and validate its shape.
      *
+     * The signature key must be present, but may hold the null recorded for a
+     * modules directory that could not be read when the manifest was written.
+     *
      * @return array{signature: string|null, modules: array<string, string>}|null
      *
+     * @SuppressWarnings("php:S1142")
      * @SuppressWarnings("php:S4833")
      * @SuppressWarnings("php:S2003")
      */
@@ -137,10 +141,18 @@ final readonly class ModuleManifest
         // otherwise raise a conversion warning on every request.
         if (
             !is_array($manifest)
-            || !isset($manifest['modules'], $manifest['signature'])
+            || !isset($manifest['modules'])
             || !is_array($manifest['modules'])
             || array_filter($manifest['modules'], 'is_string') !== $manifest['modules']
         ) {
+            return null;
+        }
+
+        if (!array_key_exists('signature', $manifest)) {
+            return null;
+        }
+
+        if ($manifest['signature'] !== null && !is_string($manifest['signature'])) {
             return null;
         }
 

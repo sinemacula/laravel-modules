@@ -18,7 +18,7 @@ use SineMacula\Laravel\Modules\Configuration\Modules;
  * @author      Ben Carey <bdmc@sinemacula.co.uk>
  * @copyright   2026 Sine Macula Limited
  */
-final class ModuleTree
+final readonly class ModuleTree
 {
     /** @var list<string> The directory structure created within each module. */
     private const array MODULE_DIRECTORIES = [
@@ -29,14 +29,8 @@ final class ModuleTree
         'Listeners',
     ];
 
-    /** @var \ReflectionProperty|null Cached handle to the Modules::$modules property. */
-    private static ?\ReflectionProperty $modulesProperty = null; // @phpstan-ignore sineMacula.mutableStaticProperty (cached reflection handle for state resets)
-
-    /** @var \ReflectionProperty|null Cached handle to the Modules::$resolvedPaths property. */
-    private static ?\ReflectionProperty $resolvedPathsProperty = null; // @phpstan-ignore sineMacula.mutableStaticProperty (cached reflection handle for state resets)
-
     /** @var string The root path of the temporary application. */
-    private readonly string $basePath;
+    private string $basePath;
 
     /**
      * @param  string  $basePath
@@ -82,11 +76,7 @@ final class ModuleTree
      */
     public static function reset(): void
     {
-        self::$modulesProperty       ??= new \ReflectionProperty(Modules::class, 'modules');
-        self::$resolvedPathsProperty ??= new \ReflectionProperty(Modules::class, 'resolvedPaths');
-
-        self::$modulesProperty->setValue(null, null);
-        self::$resolvedPathsProperty->setValue(null, []);
+        Modules::flush();
     }
 
     /**

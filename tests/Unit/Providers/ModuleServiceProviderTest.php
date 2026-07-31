@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Tests\Unit\Providers;
 
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Facades\Facade;
@@ -294,7 +295,7 @@ final class ModuleServiceProviderTest extends TestCase
 
         Modules::setBasePath($this->tempDir);
 
-        $app = new FoundationApplication($this->tempDir);
+        $app = $this->createApplication(new ConfigRepository);
 
         $provider = new ModuleServiceProvider($app);
 
@@ -321,7 +322,7 @@ final class ModuleServiceProviderTest extends TestCase
 
         Modules::setBasePath($this->tempDir);
 
-        $app = new FoundationApplication($this->tempDir);
+        $app = $this->createApplication(new ConfigRepository);
 
         $provider = new ModuleServiceProvider($app);
 
@@ -354,7 +355,7 @@ final class ModuleServiceProviderTest extends TestCase
     #[RunInSeparateProcess]
     public function testRegisterSetsBasePathFromApplication(): void
     {
-        $app = new FoundationApplication($this->tempDir);
+        $app = $this->createApplication(new ConfigRepository);
 
         $provider = new ModuleServiceProvider($app);
 
@@ -367,6 +368,68 @@ final class ModuleServiceProviderTest extends TestCase
     }
 
     /**
+     * Test that register drops a configured view path whose directory does not
+     * exist, and reindexes the paths that survive.
+     *
+     * @return void
+     */
+    public function testRegisterDropsViewPathsThatDoNotExist(): void
+    {
+        $this->createDirectory('first');
+        $this->createDirectory('last');
+
+        $first   = $this->tempDir . DIRECTORY_SEPARATOR . 'first';
+        $last    = $this->tempDir . DIRECTORY_SEPARATOR . 'last';
+        $missing = $this->tempDir . DIRECTORY_SEPARATOR . 'missing';
+
+        $config = new ConfigRepository(['view' => ['paths' => [$first, $missing, $last]]]);
+
+        $provider = new ModuleServiceProvider($this->createApplication($config));
+
+        $provider->register();
+
+        self::assertSame([$first, $last], $config->get('view.paths'));
+    }
+
+    /**
+     * Test that register drops a configured view path that is not a string,
+     * which would otherwise fail the directory check outright.
+     *
+     * @return void
+     */
+    public function testRegisterDropsViewPathsThatAreNotStrings(): void
+    {
+        $this->createDirectory('first');
+
+        $first = $this->tempDir . DIRECTORY_SEPARATOR . 'first';
+
+        $config = new ConfigRepository(['view' => ['paths' => [$first, 123]]]);
+
+        $provider = new ModuleServiceProvider($this->createApplication($config));
+
+        $provider->register();
+
+        self::assertSame([$first], $config->get('view.paths'));
+    }
+
+    /**
+     * Test that register leaves an application with no configured view paths
+     * holding an empty list rather than failing.
+     *
+     * @return void
+     */
+    public function testRegisterEmptiesTheViewPathsWhenNoneAreConfigured(): void
+    {
+        $config = new ConfigRepository;
+
+        $provider = new ModuleServiceProvider($this->createApplication($config));
+
+        $provider->register();
+
+        self::assertSame([], $config->get('view.paths'));
+    }
+
+    /**
      * Create a spy provider that tracks calls to protected methods.
      *
      * @return \Tests\Support\Spies\SpyModuleServiceProvider
@@ -376,5 +439,20 @@ final class ModuleServiceProviderTest extends TestCase
         $app = \Mockery::mock(Application::class);
 
         return new SpyModuleServiceProvider($app); // @phpstan-ignore argument.type (the Mockery mock satisfies the Application contract the provider needs at runtime)
+    }
+
+    /**
+     * Create an application with the given configuration repository bound.
+     *
+     * @param  \Illuminate\Config\Repository  $config
+     * @return \Illuminate\Foundation\Application
+     */
+    private function createApplication(ConfigRepository $config): FoundationApplication
+    {
+        $app = new FoundationApplication($this->tempDir);
+
+        $app->instance('config', $config);
+
+        return $app;
     }
 }

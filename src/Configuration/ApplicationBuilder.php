@@ -24,6 +24,8 @@ class ApplicationBuilder extends BaseApplicationBuilder
      * application's configured service providers (bootstrap/providers.php).
      *
      * @return static
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public function withModules(): static
     {

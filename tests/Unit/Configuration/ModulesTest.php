@@ -930,21 +930,15 @@ final class ModulesTest extends TestCase
         (new ModuleManifest($cachePath, $this->tempDir . DIRECTORY_SEPARATOR . 'modules'))
             ->write(static fn (): array => ['cached_module' => $fakePath]);
 
-        $routes = Modules::routePaths();
+        // The cache supplies the module map, so its entry is present and the
+        // ones only discovery would have found are not.
+        self::assertSame(['cached_module'], array_keys(Modules::getModules()));
 
-        // The cached_module key should be present instead of alpha/beta from
-        // discovery
-        self::assertArrayNotHasKey('alpha', $routes);
-        self::assertArrayNotHasKey('beta', $routes);
-
-        // The cached_module does not have routes.php, so it should be filtered
-        // out, but the key should have been attempted - confirming cache was
-        // used
-        $views = Modules::viewPaths();
-
-        // Verify that 'alpha' (from discovery) is NOT present, confirming cache
-        // was used
-        self::assertArrayNotHasKey('alpha', $views);
+        // cached_module points at the alpha directory, which has views but no
+        // routes file, so it resolves under its cached name.
+        self::assertArrayHasKey('cached_module', Modules::viewPaths());
+        self::assertArrayNotHasKey('alpha', Modules::viewPaths());
+        self::assertArrayNotHasKey('alpha', Modules::routePaths());
     }
 
     /**

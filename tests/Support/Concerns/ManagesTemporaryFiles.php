@@ -27,9 +27,11 @@ trait ManagesTemporaryFiles
      */
     protected function createTempDirectory(string $prefix = 'test-'): void
     {
+        // uniqid() alone is microsecond-derived, so parallel workers collide
+        // and then tear down each other's directory.
         $this->tempDir = sys_get_temp_dir()
             . DIRECTORY_SEPARATOR
-            . $prefix . uniqid();
+            . $prefix . getmypid() . '_' . bin2hex(random_bytes(8));
 
         mkdir($this->tempDir, 0755, true);
 

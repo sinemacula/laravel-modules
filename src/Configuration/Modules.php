@@ -94,6 +94,8 @@ final class Modules
      * Return the path to the modules directory.
      *
      * @return string
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function modulesPath(): string
     {
@@ -104,6 +106,8 @@ final class Modules
      * Clear the cached application modules.
      *
      * @return bool true when no cache file remains after the operation
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function clearCache(): bool
     {
@@ -122,6 +126,8 @@ final class Modules
      *
      * @param  string  $path
      * @return string
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function resourcePath(string $path = ''): string
     {
@@ -137,6 +143,8 @@ final class Modules
      * Return the module paths to the routes.
      *
      * @return array<string, string>
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function routePaths(): array
     {
@@ -147,6 +155,8 @@ final class Modules
      * Return the module paths to the views directory.
      *
      * @return array<string, string>
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function viewPaths(): array
     {
@@ -157,6 +167,8 @@ final class Modules
      * Return the module paths to the translation files directory.
      *
      * @return array<string, string>
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function langPaths(): array
     {
@@ -167,6 +179,8 @@ final class Modules
      * Return the module paths to the event listeners directory.
      *
      * @return array<string, string>
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function listenerPaths(): array
     {
@@ -177,6 +191,8 @@ final class Modules
      * Return the module paths to the console commands directory.
      *
      * @return array<string, string>
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function commandPaths(): array
     {
@@ -187,6 +203,8 @@ final class Modules
      * Return the module paths to the schedule files.
      *
      * @return array<string, string>
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function schedulePaths(): array
     {
@@ -223,6 +241,8 @@ final class Modules
      *
      * @param  string  $name
      * @return string|null
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public static function getModule(string $name): ?string
     {
@@ -350,6 +370,8 @@ final class Modules
      *
      * @param  string  $path
      * @return array<string, string>
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     private static function resolvePaths(string $path): array
     {

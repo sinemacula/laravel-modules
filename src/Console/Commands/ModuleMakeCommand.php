@@ -43,6 +43,8 @@ final class ModuleMakeCommand extends Command
      *
      * @param  \Illuminate\Filesystem\Filesystem  $filesystem
      * @return int
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public function handle(Filesystem $filesystem): int
     {
@@ -101,6 +103,8 @@ final class ModuleMakeCommand extends Command
      * @param  \Illuminate\Filesystem\Filesystem  $filesystem
      * @param  string  $name
      * @return int
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     private function scaffold(Filesystem $filesystem, string $name): int
     {

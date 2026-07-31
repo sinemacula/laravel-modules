@@ -28,6 +28,8 @@ class ModuleServiceProvider extends ServiceProvider
      * Register any module services.
      *
      * @return void
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     #[\Override]
     public function register(): void
@@ -41,6 +43,8 @@ class ModuleServiceProvider extends ServiceProvider
      * Bootstrap any module services.
      *
      * @return void
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public function boot(): void
     {
@@ -58,6 +62,8 @@ class ModuleServiceProvider extends ServiceProvider
      * Register the module views.
      *
      * @return void
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     private function registerViews(): void
     {
@@ -70,6 +76,8 @@ class ModuleServiceProvider extends ServiceProvider
      * Register the module translation files.
      *
      * @return void
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     private function registerTranslations(): void
     {

@@ -25,6 +25,8 @@ final class ModuleClearCommand extends Command
      * Execute the console command.
      *
      * @return int
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     public function handle(): int
     {

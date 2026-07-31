@@ -24,6 +24,8 @@ if (!function_exists('module_path')) {
      * @param  string  $path
      * @return string
      *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
+     *
      * @SuppressWarnings("php:S100")
      */
     function module_path(string $path = ''): string // phpcs:ignore Squiz.NamingConventions.ValidFunctionName.NotCamelCaps

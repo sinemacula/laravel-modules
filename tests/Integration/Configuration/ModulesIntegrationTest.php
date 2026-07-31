@@ -77,16 +77,10 @@ final class ModulesIntegrationTest extends TestCase
         self::assertArrayHasKey('alpha', $viewPaths);
         self::assertArrayHasKey('alpha', $langPaths);
 
-        // Verify discovery via modulesPath containing all three
-        $modulesPath = Modules::modulesPath();
-        self::assertDirectoryExists(
-            $modulesPath . DIRECTORY_SEPARATOR . 'alpha',
-        );
-        self::assertDirectoryExists(
-            $modulesPath . DIRECTORY_SEPARATOR . 'beta',
-        );
-        self::assertDirectoryExists(
-            $modulesPath . DIRECTORY_SEPARATOR . 'gamma',
+        // Every module directory is discovered, whatever it contains.
+        self::assertSame(
+            ['alpha', 'beta', 'gamma'],
+            array_keys(Modules::getModules()),
         );
     }
 

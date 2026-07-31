@@ -201,11 +201,11 @@ final class ApplicationBuilderTest extends TestCase
     }
 
     /**
-     * Test that withModules handles an empty modules directory without errors.
+     * Test that withModules registers nothing when no modules are discovered.
      *
      * @return void
      */
-    public function testWithModulesHandlesEmptyGlobResults(): void
+    public function testWithModulesRegistersNothingWhenNoModulesExist(): void
     {
         // The modules directory exists but is empty
         $app     = new Application($this->tempDir);

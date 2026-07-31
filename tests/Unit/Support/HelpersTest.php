@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Tests\Unit\Support;
 
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\TestCase;
 use SineMacula\Laravel\Modules\Configuration\Modules;
 use Tests\Support\Concerns\InteractsWithModules;
@@ -18,7 +18,7 @@ use Tests\Support\Concerns\ManagesTemporaryFiles;
  *
  * @internal
  */
-#[CoversNothing]
+#[CoversFunction('module_path')]
 final class HelpersTest extends TestCase
 {
     use InteractsWithModules, ManagesTemporaryFiles;

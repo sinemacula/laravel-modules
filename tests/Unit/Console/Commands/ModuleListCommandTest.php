@@ -200,8 +200,11 @@ final class ModuleListCommandTest extends TestCase
     {
         $output = $this->runListCommand();
 
-        self::assertStringNotContainsString('Module', $output);
-        self::assertStringNotContainsString('Path', $output);
+        // Assert on the table itself rather than its header words, so that
+        // rewording the warning cannot break this for an unrelated reason.
+        self::assertStringNotContainsString('+---', $output);
+        self::assertStringNotContainsString('|', $output);
+        self::assertMatchesRegularExpression('/no modules discovered/i', $output);
     }
 
     /**

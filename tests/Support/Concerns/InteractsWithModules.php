@@ -22,7 +22,11 @@ use SineMacula\Laravel\Modules\Configuration\Modules;
 trait InteractsWithModules
 {
     /**
-     * Reset all static state on the Modules class.
+     * Discard the memoised module state.
+     *
+     * The base path is left as it is. It is a typed static with no default, so
+     * it cannot be returned to its uninitialised state once set; a test that
+     * needs it unset has to run in a separate process.
      *
      * @return void
      */

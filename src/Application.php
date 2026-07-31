@@ -21,6 +21,8 @@ final class Application extends BaseApplication
      *
      * @param  string|null  $basePath
      * @return \SineMacula\Laravel\Modules\Configuration\ApplicationBuilder
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     #[\Override]
     public static function configure(?string $basePath = null): ApplicationBuilder
@@ -42,6 +44,8 @@ final class Application extends BaseApplication
      *
      * @param  string  $path
      * @return string
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
      */
     #[\Override]
     public function resourcePath($path = ''): string

@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/sinemacula/laravel-modules/compare/v1.1.0...v1.2.0) (2026-07-31)
+
+
+### Features
+
+* canonicalise the module base path and flush state when it changes ([#50](https://github.com/sinemacula/laravel-modules/issues/50)) ([0a7e853](https://github.com/sinemacula/laravel-modules/commit/0a7e853ae170421a555325c44cef4262f7d01f80))
+* **commands:** scaffold the resource and schedule conventions ([#53](https://github.com/sinemacula/laravel-modules/issues/53)) ([a7f4e64](https://github.com/sinemacula/laravel-modules/commit/a7f4e6445bbb4663abef0f8aa89003c952646809))
+
+
+### Bug Fixes
+
+* discard the module cache once the module set has changed ([#47](https://github.com/sinemacula/laravel-modules/issues/47)) ([8fdb8b6](https://github.com/sinemacula/laravel-modules/commit/8fdb8b6cbfbbfb2c996d98ebaa58f35a8523773e))
+* order discovered modules and reject manifests with unusable paths ([#51](https://github.com/sinemacula/laravel-modules/issues/51)) ([363176c](https://github.com/sinemacula/laravel-modules/commit/363176cd18d45570ead3846e90df4218d31b0e7d))
+* reject module directories that cannot be resolved ([#52](https://github.com/sinemacula/laravel-modules/issues/52)) ([9bd0635](https://github.com/sinemacula/laravel-modules/commit/9bd0635dc9a702f7af0227a29a96f2ee6f624fc2))
+
 ## [1.1.0](https://github.com/sinemacula/laravel-modules/compare/v1.0.2...v1.1.0) (2026-06-27)
 
 

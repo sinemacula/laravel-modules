@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/sinemacula/laravel-modules/compare/v1.2.0...v1.3.0) (2026-07-31)
+
+
+### Features
+
+* prune missing view paths and expose a public module state reset ([#59](https://github.com/sinemacula/laravel-modules/issues/59)) ([86b4ba5](https://github.com/sinemacula/laravel-modules/commit/86b4ba56293a318d76926143cd4b7d9233799fa1))
+
 ## [1.2.0](https://github.com/sinemacula/laravel-modules/compare/v1.1.0...v1.2.0) (2026-07-31)
 
 

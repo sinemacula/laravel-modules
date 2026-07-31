@@ -4,7 +4,33 @@ use Symfony\Component\Console\Input\ArgvInput;
 
 $autoload = getenv('LARAVEL_MODULES_FIXTURE_AUTOLOAD');
 
-require is_string($autoload) && $autoload !== '' ? $autoload : dirname(__DIR__, 3) . '/vendor/autoload.php';
+$loader = require is_string($autoload) && $autoload !== '' ? $autoload : dirname(__DIR__, 3) . '/vendor/autoload.php';
+
+// The package autoloader maps App\ to the committed fixture, so without this a
+// staged module would load the class it was copied from rather than its own.
+$modules = __DIR__ . '/modules';
+
+if (is_dir($modules)) {
+
+    $classes = [];
+
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($modules, RecursiveDirectoryIterator::SKIP_DOTS)
+    );
+
+    foreach ($files as $file) {
+
+        if ($file->getExtension() !== 'php' || !ctype_upper($file->getBasename('.php')[0])) {
+            continue;
+        }
+
+        $relative = substr($file->getPathname(), strlen($modules) + 1, -4);
+
+        $classes['App\\' . str_replace(DIRECTORY_SEPARATOR, '\\', $relative)] = $file->getPathname();
+    }
+
+    $loader->addClassMap($classes);
+}
 
 $app = require __DIR__ . '/bootstrap/app.php';
 

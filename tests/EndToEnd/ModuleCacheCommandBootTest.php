@@ -60,11 +60,16 @@ final class ModuleCacheCommandBootTest extends EndToEndTestCase
      * Test that the optimize lifecycle runs to completion and writes the module
      * cache.
      *
+     * The staged application has no resources directory, so a lifecycle that
+     * depended on one would abort before reaching the module cache.
+     *
      * @return void
      */
     public function testOptimizeWritesTheModuleCache(): void
     {
         @unlink($this->fixtureAppPath . '/bootstrap/cache/modules.php');
+
+        self::assertDirectoryDoesNotExist($this->fixtureAppPath . '/resources');
 
         $process = $this->runFixtureArtisan(['optimize']);
 

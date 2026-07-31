@@ -62,6 +62,35 @@ final class Application extends BaseApplication
     }
 
     /**
+     * Get the path to the views directory.
+     *
+     * Returns the first configured view path. A modular application resolves
+     * its views through module namespaces, so that list is empty whenever no
+     * application-level views directory exists, and the resource path is used
+     * instead of reading past the end of it.
+     *
+     * phpcs:disable Squiz.Commenting.FunctionComment.ScalarTypeHintMissing
+     *
+     * @param  string  $path
+     * @return string
+     *
+     * @throws \SineMacula\Laravel\Modules\Exceptions\ModuleException
+     */
+    #[\Override]
+    public function viewPath($path = ''): string
+    {
+        // phpcs:enable
+        $paths = (array) $this->make('config')->get('view.paths');
+        $first = array_key_first($paths);
+
+        $viewPath = $first !== null && is_string($paths[$first])
+            ? $paths[$first]
+            : $this->resourcePath('views');
+
+        return $this->joinPaths(rtrim($viewPath, DIRECTORY_SEPARATOR), $path);
+    }
+
+    /**
      * Get the path to the application "app" directory.
      *
      * phpcs:disable Squiz.Commenting.FunctionComment.ScalarTypeHintMissing

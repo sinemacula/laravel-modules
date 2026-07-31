@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace SineMacula\Laravel\Modules\Providers;
 
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Support\ServiceProvider;
 use SineMacula\Laravel\Modules\Configuration\Modules;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleCacheCommand;
@@ -36,6 +37,7 @@ class ModuleServiceProvider extends ServiceProvider
     {
         Modules::setBasePath($this->app->basePath());
 
+        $this->pruneMissingViewPaths();
         $this->registerCommands();
     }
 
@@ -84,6 +86,28 @@ class ModuleServiceProvider extends ServiceProvider
         foreach (Modules::langPaths() as $module => $path) {
             $this->loadTranslationsFrom($path, $module);
         }
+    }
+
+    /**
+     * Remove the configured view paths that do not exist.
+     *
+     * View caching reads every configured path and fails on any that is
+     * missing. The default module ships without a Resources directory, so the
+     * resource path falls back to the framework default, which a modular
+     * application has no reason to create.
+     *
+     * @return void
+     */
+    private function pruneMissingViewPaths(): void
+    {
+        $config = $this->app->make(ConfigRepository::class);
+
+        $paths = array_filter(
+            (array) $config->get('view.paths'),
+            static fn (mixed $path): bool => is_string($path) && is_dir($path),
+        );
+
+        $config->set('view.paths', array_values($paths));
     }
 
     /**

@@ -160,6 +160,12 @@ stray file such as `.DS_Store` also sends the next boot down the discovery path 
 `module:make` does not write the cache. It creates a directory under `modules/`, which the validation above treats as a
 change, so the next boot rediscovers and the new module appears without any further step.
 
+`optimize` also runs `view:cache`, which fails outright on a configured view path that does not exist. A modular
+application has no `resources/views` directory of its own, and that is where `config('view.paths')` points by default,
+so the package drops every missing entry from `view.paths` when it registers. Module views are unaffected: they resolve
+through their own namespace rather than through `view.paths`. The pruned list is what `config:cache` writes too, so an
+application that adds `resources/views` after an `optimize` run needs the caches rebuilt before it takes effect.
+
 ## Installation
 
 ```bash
@@ -256,7 +262,7 @@ module_path();           // <base>/modules
 module_path('Billing');  // <base>/modules/Billing
 ```
 
-The `Modules` resolver is the public surface behind discovery. Every method resolves lazily and drops modules that do
+The `Modules` resolver is the public surface behind discovery. The path methods resolve lazily and drop modules that do
 not have the directory or file in question:
 
 | Method                       | Returns                                                |
@@ -271,10 +277,12 @@ not have the directory or file in question:
 | `Modules::commandPaths()`    | Module name to `Console/Commands/`                     |
 | `Modules::schedulePaths()`   | Module name to `Console/schedule.php`                  |
 | `Modules::defaultModule()`   | The module unprefixed resources resolve against        |
+| `Modules::flush()`           | Nothing - discards the memoised maps                   |
 
 State is process-wide: the base path and every resolved map are static and shared by all callers in the process.
 `Modules::setBasePath()` discards the resolved maps when the path changes, and `module:cache` / `module:clear` rebuild
-them.
+them. `Modules::flush()` discards them on demand and leaves the cached manifest in place, so a test suite can reset
+discovery in its teardown; the base path is left as it is, so set it again when the next application lives elsewhere.
 
 ### The default module and `resource_path()`
 
@@ -292,6 +300,11 @@ container paths through the same method, that directory becomes the application'
 |---------------------------|--------------------------------|---------------------------------------------|
 | `resource_path()`         | `<base>/resources`             | `<base>/modules/Foundation/Resources`       |
 | `config('view.paths')[0]` | `<base>/resources/views`       | `<base>/modules/Foundation/Resources/views` |
+
+The `view.paths` entry is dropped rather than kept when the directory it names does not exist, so an application with
+neither `modules/Foundation/Resources/views` nor `resources/views` boots with an empty `view.paths` and resolves every
+view through a module namespace. `view_path()` reads the first configured path, so it falls back to `resource_path()`
+while that list is empty rather than reading past the end of it.
 
 `lang_path()` follows the same rule but only once `modules/Foundation/Resources/lang/` exists, because Laravel falls
 back to `<base>/lang` while that directory is absent. Creating it therefore relocates the framework's published

@@ -177,6 +177,80 @@ final class ModuleManifestTest extends TestCase
     }
 
     /**
+     * Test that a manifest written for a modules directory that could not be
+     * read is honoured, because a null signature is a recorded value.
+     *
+     * @return void
+     */
+    public function testReadReturnsModulesWhenTheStoredSignatureIsNull(): void
+    {
+        $manifest = new ModuleManifest($this->manifestPath, $this->tempDir . '/missing');
+
+        $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+
+        self::assertSame(['alpha' => '/somewhere/alpha'], $manifest->read());
+    }
+
+    /**
+     * Test that a manifest carrying a null signature is discarded once the
+     * modules directory can be read, so a stale module set is never served.
+     *
+     * @return void
+     */
+    public function testReadReturnsNullOnceTheModulesDirectoryAppears(): void
+    {
+        $modules  = $this->tempDir . '/missing';
+        $manifest = new ModuleManifest($this->manifestPath, $modules);
+
+        $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+
+        mkdir($modules, 0755, true);
+
+        self::assertNull($manifest->read());
+    }
+
+    /**
+     * Test that a manifest whose stored signature is neither a string nor null
+     * is discarded.
+     *
+     * @return void
+     */
+    public function testReadReturnsNullWhenTheStoredSignatureIsNotAString(): void
+    {
+        // No signature can be captured for an absent directory, so the shape
+        // guard is what rejects this.
+        $manifest = new ModuleManifest($this->manifestPath, $this->tempDir . '/missing');
+
+        file_put_contents(
+            $this->manifestPath,
+            "<?php\nreturn " . var_export([
+                'signature' => 123,
+                'modules'   => ['alpha' => '/somewhere/alpha'],
+            ], true) . ';',
+        );
+
+        self::assertNull($manifest->read());
+    }
+
+    /**
+     * Test that a manifest carrying no signature key at all is discarded even
+     * when the current signature is unknown.
+     *
+     * @return void
+     */
+    public function testReadReturnsNullWhenTheSignatureKeyIsAbsent(): void
+    {
+        $manifest = new ModuleManifest($this->manifestPath, $this->tempDir . '/missing');
+
+        file_put_contents(
+            $this->manifestPath,
+            "<?php\nreturn " . var_export(['modules' => ['alpha' => '/somewhere/alpha']], true) . ';',
+        );
+
+        self::assertNull($manifest->read());
+    }
+
+    /**
      * Test that a manifest written before the signature was introduced is
      * discarded rather than trusted.
      *

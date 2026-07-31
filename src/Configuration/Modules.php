@@ -119,6 +119,22 @@ final class Modules
     }
 
     /**
+     * Discard the memoised module state.
+     *
+     * The next read resolves the module map again, from the manifest when one
+     * exists and from discovery otherwise. The manifest file itself is left in
+     * place, and so is the base path, which is a typed static that cannot be
+     * returned to its uninitialised state once set.
+     *
+     * @return void
+     */
+    public static function flush(): void
+    {
+        self::$modules       = null;
+        self::$resolvedPaths = [];
+    }
+
+    /**
      * Get the path to a module's resources directory.
      *
      * A module can be specified using the {module}::{path} format. When no
@@ -247,17 +263,6 @@ final class Modules
     public static function getModule(string $name): ?string
     {
         return self::getModules()[strtolower($name)] ?? null;
-    }
-
-    /**
-     * Flush all in-memory state.
-     *
-     * @return void
-     */
-    private static function flush(): void
-    {
-        self::$modules       = null;
-        self::$resolvedPaths = [];
     }
 
     /**

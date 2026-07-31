@@ -82,6 +82,26 @@ final class ModulesTest extends TestCase
     }
 
     /**
+     * Test that the default module is the one unprefixed resources resolve
+     * against.
+     *
+     * @return void
+     */
+    public function testDefaultModuleMatchesUnprefixedResourceResolution(): void
+    {
+        $default = Modules::defaultModule();
+
+        $this->createDirectory('modules/' . $default . '/Resources');
+
+        Modules::setBasePath($this->tempDir);
+
+        self::assertSame(
+            Modules::resourcePath($default . '::'),
+            Modules::resourcePath(),
+        );
+    }
+
+    /**
      * Test that two module directories differing only by case are rejected
      * rather than one silently replacing the other.
      *

@@ -66,14 +66,24 @@ package does not auto-discover module providers, so you keep full control over t
 
 ```text
 modules/Billing/
-├── Console/Commands/
+├── Console/
+│   ├── Commands/
+│   └── schedule.php
 ├── Http/
 │   ├── Controllers/
 │   ├── Requests/
 │   └── routes.php
 ├── Listeners/
-└── Models/
+├── Models/
+└── Resources/
+    ├── lang/
+    └── views/
 ```
+
+The `Foundation` module is scaffolded without `Resources/`. It is the default module, so a `Resources` directory
+there becomes the application's `resource_path()`, and a `Resources/lang` inside it becomes `lang_path()` - which
+would move your Vite root and orphan the framework's published translations. Create it by hand if that is what you
+intend.
 
 ### Module Caching
 

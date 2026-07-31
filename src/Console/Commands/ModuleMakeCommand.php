@@ -17,13 +17,19 @@ use SineMacula\Laravel\Modules\Configuration\Modules;
  */
 final class ModuleMakeCommand extends Command
 {
-    /** @var list<string> The directories to create within a new module. */
+    /** @var list<string> The directories to create within every new module. */
     private const array DIRECTORIES = [
         'Console/Commands',
         'Http/Controllers',
         'Http/Requests',
         'Listeners',
         'Models',
+    ];
+
+    /** @var list<string> The directories to create only outside the default module. */
+    private const array RESOURCE_DIRECTORIES = [
+        'Resources/lang',
+        'Resources/views',
     ];
 
     /** @var string The name and signature of the console command. */
@@ -108,9 +114,15 @@ final class ModuleMakeCommand extends Command
             return self::FAILURE;
         }
 
+        $isDefault = strtolower($name) === Modules::defaultModule();
+
+        $directories = $isDefault
+            ? self::DIRECTORIES
+            : [...self::DIRECTORIES, ...self::RESOURCE_DIRECTORIES];
+
         try {
 
-            foreach (self::DIRECTORIES as $directory) {
+            foreach ($directories as $directory) {
 
                 $path = $modulePath . DIRECTORY_SEPARATOR . $directory;
 
@@ -122,6 +134,11 @@ final class ModuleMakeCommand extends Command
                 $modulePath . DIRECTORY_SEPARATOR . 'Http' . DIRECTORY_SEPARATOR . 'routes.php',
                 "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n",
             );
+
+            $filesystem->put(
+                $modulePath . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'schedule.php',
+                "<?php\n\nuse Illuminate\\Support\\Facades\\Schedule;\n",
+            );
         } catch (\Throwable $exception) { // @phpstan-ignore catch.neverThrown
 
             $this->components->error("Failed to create module [{$name}]: " . $exception->getMessage());
@@ -130,6 +147,13 @@ final class ModuleMakeCommand extends Command
         }
 
         $this->components->info("Module [{$name}] created successfully.");
+
+        if ($isDefault) {
+            $this->components->info(
+                "No Resources directory was created for [{$name}]. Adding one to the "
+                . 'default module repoints resource_path() and lang_path() into it.',
+            );
+        }
 
         return self::SUCCESS;
     }

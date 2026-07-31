@@ -81,6 +81,16 @@ final class Modules
     }
 
     /**
+     * Return the name of the module used to resolve unprefixed resources.
+     *
+     * @return string
+     */
+    public static function defaultModule(): string
+    {
+        return self::DEFAULT_MODULE;
+    }
+
+    /**
      * Return the path to the modules directory.
      *
      * @return string

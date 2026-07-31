@@ -6,9 +6,11 @@ namespace Tests\Unit\Console\Commands;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use SineMacula\Laravel\Modules\Configuration\Modules;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleMakeCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -90,6 +92,72 @@ final class ModuleMakeCommandTest extends TestCase
         self::assertDirectoryExists($modulePath . '/Http/Requests');
         self::assertDirectoryExists($modulePath . '/Listeners');
         self::assertDirectoryExists($modulePath . '/Models');
+        self::assertDirectoryExists($modulePath . '/Resources/views');
+        self::assertDirectoryExists($modulePath . '/Resources/lang');
+    }
+
+    /**
+     * Test that a scaffolded module can hold a schedule without a manual mkdir.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
+     */
+    public function testHandleWritesScheduleFileWithExpectedContent(): void
+    {
+        $this->runMakeCommand('billing');
+
+        $scheduleFile = $this->modulePath('Billing')
+            . DIRECTORY_SEPARATOR . 'Console'
+            . DIRECTORY_SEPARATOR . 'schedule.php';
+
+        $schedules = array_values(array_filter(
+            $this->filesystem->writes,
+            static fn (array $write): bool => $write['path'] === $scheduleFile,
+        ));
+
+        self::assertCount(1, $schedules);
+        self::assertStringContainsString('use Illuminate\Support\Facades\Schedule;', $schedules[0]['contents']);
+    }
+
+    /**
+     * Test that the default module is scaffolded without a Resources directory,
+     * because creating one repoints resource_path() and lang_path() into it.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
+     */
+    public function testHandleOmitsResourcesFromTheDefaultModule(): void
+    {
+        $exitCode = $this->runMakeCommand(Modules::defaultModule());
+
+        $modulePath = $this->modulePath(Str::studly(Modules::defaultModule()));
+
+        self::assertSame(0, $exitCode);
+        self::assertDirectoryExists($modulePath . '/Models');
+        self::assertDirectoryDoesNotExist($modulePath . '/Resources');
+        self::assertDirectoryDoesNotExist($modulePath . '/Resources/lang');
+    }
+
+    /**
+     * Test that omitting the default module's Resources directory is explained
+     * rather than silent.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
+     */
+    public function testHandleExplainsWhyTheDefaultModuleHasNoResources(): void
+    {
+        $this->runMakeCommand(Modules::defaultModule());
+
+        // Spans the concatenation so a reordered message cannot pass.
+        self::assertStringContainsString(
+            'Adding one to the default module repoints',
+            preg_replace('/\s+/', ' ', $this->output) ?? '',
+        );
+        self::assertStringContainsString('lang_path()', $this->output);
     }
 
     /**

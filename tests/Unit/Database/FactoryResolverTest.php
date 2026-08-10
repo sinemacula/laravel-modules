@@ -161,8 +161,8 @@ final class FactoryResolverTest extends TestCase
     public function testAModuleNamedAfterTheModelsDirectoryIsStillAModule(): void
     {
         self::assertSame(
-            'Database\Factories\Modelling\Models\ReportFactory',
-            FactoryResolver::factoryNameFor('App\Modelling\Models\Report'),
+            'Database\Factories\ModelsArchive\Models\ReportFactory',
+            FactoryResolver::factoryNameFor('App\ModelsArchive\Models\Report'),
         );
     }
 

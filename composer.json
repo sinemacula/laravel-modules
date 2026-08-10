@@ -57,6 +57,15 @@
         }
     },
     "scripts": {
+        "post-install-cmd": [
+            "@hooks"
+        ],
+        "post-update-cmd": [
+            "@hooks"
+        ],
+        "hooks": [
+            "sh .qlty/hooks/install.sh"
+        ],
         "check": [
             "qlty check"
         ],
@@ -90,6 +99,7 @@
         ]
     },
     "scripts-descriptions": {
+        "hooks": "Link the tracked pre-commit and pre-push hooks into this checkout.",
         "check": "Run static analysis and lint checks via qlty.",
         "format": "Format codebase using qlty.",
         "smells": "Report code smells (duplication, complexity) via qlty.",

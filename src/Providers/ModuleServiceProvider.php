@@ -11,6 +11,7 @@ use SineMacula\Laravel\Modules\Console\Commands\ModuleCacheCommand;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleClearCommand;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleListCommand;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleMakeCommand;
+use SineMacula\Laravel\Modules\Database\FactoryResolver;
 
 /**
  * Module service provider.
@@ -52,6 +53,8 @@ class ModuleServiceProvider extends ServiceProvider
     {
         $this->registerViews();
         $this->registerTranslations();
+
+        FactoryResolver::register();
 
         $this->optimizes(
             optimize: 'module:cache',

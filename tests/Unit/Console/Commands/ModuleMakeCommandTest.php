@@ -117,7 +117,9 @@ final class ModuleMakeCommandTest extends TestCase
         ));
 
         self::assertCount(1, $schedules);
-        self::assertStringContainsString('use Illuminate\Support\Facades\Schedule;', $schedules[0]['contents']);
+        self::assertStringStartsWith("<?php\n\ndeclare(strict_types = 1);\n", $schedules[0]['contents']);
+        self::assertStringContainsString('// use Illuminate\Support\Facades\Schedule;', $schedules[0]['contents']);
+        self::assertDoesNotMatchRegularExpression('/^use /m', $schedules[0]['contents']);
     }
 
     /**
@@ -204,8 +206,9 @@ final class ModuleMakeCommandTest extends TestCase
         ));
 
         self::assertCount(1, $routes);
-        self::assertStringContainsString('<?php', $routes[0]['contents']);
-        self::assertStringContainsString('use Illuminate\Support\Facades\Route;', $routes[0]['contents']);
+        self::assertStringStartsWith("<?php\n\ndeclare(strict_types = 1);\n", $routes[0]['contents']);
+        self::assertStringContainsString('// use Illuminate\Support\Facades\Route;', $routes[0]['contents']);
+        self::assertDoesNotMatchRegularExpression('/^use /m', $routes[0]['contents']);
     }
 
     /**

@@ -104,7 +104,9 @@ final class ModuleServiceProviderTest extends TestCase
     public function testBootRegistersTheFactoryResolver(): void
     {
         // The application derives its namespace by reading composer.json.
-        $this->createFile('composer.json', '{"autoload":{"psr-4":{"App\\\":"modules/"}}}');
+        $this->createFile('composer.json', <<<'JSON'
+            {"autoload": {"psr-4": {"App\\": "modules/"}}}
+            JSON);
 
         Modules::setBasePath($this->tempDir);
 

@@ -106,13 +106,12 @@ final class FactoryResolver
         }
 
         $segments = explode('\\', substr($model, strlen($namespace)));
+        $module   = array_shift($segments);
 
         // The application's own Models directory is not a module.
-        if (count($segments) < 2 || $segments[0] === self::MODELS_DIRECTORY) {
+        if ($module === self::MODELS_DIRECTORY || $segments === []) {
             return null;
         }
-
-        $module = array_shift($segments);
 
         if ($segments[0] === self::MODELS_DIRECTORY) {
             array_shift($segments);
@@ -132,13 +131,13 @@ final class FactoryResolver
     private static function moduleModelNames(Factory $factory): array
     {
         $segments = explode('\\', Str::replaceFirst(Factory::$namespace, '', $factory::class));
+        $module   = array_shift($segments);
 
-        if (count($segments) < 2) {
+        if ($segments === []) {
             return [];
         }
 
-        $module = array_shift($segments);
-        $name   = Str::replaceLast(self::FACTORY_SUFFIX, '', implode('\\', $segments));
+        $name = Str::replaceLast(self::FACTORY_SUFFIX, '', implode('\\', $segments));
 
         $namespace = self::appNamespace() . $module . '\\';
 

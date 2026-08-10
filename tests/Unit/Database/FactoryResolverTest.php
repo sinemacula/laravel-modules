@@ -139,6 +139,34 @@ final class FactoryResolverTest extends TestCase
     }
 
     /**
+     * Test that the module-scoped factory wins when a factory exists in both
+     * places, so the documented location is the one that takes effect.
+     *
+     * @return void
+     */
+    public function testTheModuleScopedFactoryWinsWhenBothExist(): void
+    {
+        self::assertSame(
+            'Database\Factories\Billing\NoteFactory',
+            FactoryResolver::factoryNameFor('App\Billing\Models\Note'),
+        );
+    }
+
+    /**
+     * Test that a module whose name merely begins with the Models directory is
+     * still treated as a module.
+     *
+     * @return void
+     */
+    public function testAModuleNamedAfterTheModelsDirectoryIsStillAModule(): void
+    {
+        self::assertSame(
+            'Database\Factories\Modelling\Models\ReportFactory',
+            FactoryResolver::factoryNameFor('App\Modelling\Models\Report'),
+        );
+    }
+
+    /**
      * Test that a model with no factory anywhere reports the module-scoped
      * name, so the resulting error names the documented location.
      *
@@ -183,7 +211,7 @@ final class FactoryResolverTest extends TestCase
      */
     public function testAnUnscopedFactoryResolvesThroughTheApplicationModelsDirectory(): void
     {
-        $application = $this->createMock(Application::class);
+        $application = self::createStub(Application::class);
 
         $application->method('getNamespace')->willReturn('App\Billing\\');
 

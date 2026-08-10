@@ -50,6 +50,11 @@ composer format   # Format the codebase via qlty
 composer smells    # Advisory code smells (duplication, complexity)
 ```
 
+`composer install` links the pre-commit and pre-push hooks into your checkout, so formatting runs before each commit and
+`composer check` before each push. Run `composer hooks` to install them by hand. Note that the hooks reuse whatever
+linter versions qlty has already installed locally, so a green push can still fail in qlty Cloud, which installs every
+tool from scratch. Reproduce a Cloud run with `qlty check --all --no-cache`.
+
 ### Testing
 
 Run the full test suite before submitting:

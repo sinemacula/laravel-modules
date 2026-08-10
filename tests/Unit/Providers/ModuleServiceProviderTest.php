@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Tests\Unit\Providers;
 
 use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Application as FoundationApplication;
@@ -103,10 +104,9 @@ final class ModuleServiceProviderTest extends TestCase
      */
     public function testBootRegistersTheFactoryResolver(): void
     {
-        // The application derives its namespace by reading composer.json.
-        $this->createFile('composer.json', <<<'JSON'
-            {"autoload": {"psr-4": {"App\\": "modules/"}}}
-            JSON);
+        // Resolution reads the application namespace from the container; an
+        // empty one falls back to the App default the fixtures live under.
+        Container::setInstance(null);
 
         Modules::setBasePath($this->tempDir);
 

@@ -5,7 +5,9 @@ declare(strict_types = 1);
 namespace Tests\Unit\Providers;
 
 use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Facades\Facade;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -63,6 +65,8 @@ final class ModuleServiceProviderTest extends TestCase
         $this->resetModulesState();
         $this->removeTempDirectory();
 
+        Factory::flushState();
+
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
 
@@ -89,6 +93,33 @@ final class ModuleServiceProviderTest extends TestCase
         self::assertContains(
             [$viewPaths['alpha'], 'alpha'],
             $provider->loadViewsFromCalls,
+        );
+    }
+
+    /**
+     * Test that boot installs the module factory resolver, so a module model
+     * reaches its factory without per-model wiring.
+     *
+     * @return void
+     */
+    public function testBootRegistersTheFactoryResolver(): void
+    {
+        // Resolution reads the application namespace from the container; an
+        // empty one falls back to the App default the fixtures live under.
+        Container::setInstance(null);
+
+        Modules::setBasePath($this->tempDir);
+
+        self::assertSame(
+            'Database\Factories\Billing\Models\InvoiceFactory',
+            Factory::resolveFactoryName('App\Billing\Models\Invoice'),
+        );
+
+        $this->createSpyProvider()->boot();
+
+        self::assertSame(
+            'Database\Factories\Billing\InvoiceFactory',
+            Factory::resolveFactoryName('App\Billing\Models\Invoice'),
         );
     }
 

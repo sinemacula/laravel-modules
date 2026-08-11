@@ -53,6 +53,7 @@
         "psr-4": {
             "App\\": "tests/Fixtures/app/modules/",
             "Benchmarks\\": "benchmarks/",
+            "Database\\Factories\\": "tests/Fixtures/app/database/factories/",
             "Tests\\": "tests/"
         }
     },

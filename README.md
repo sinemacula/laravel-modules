@@ -106,6 +106,24 @@ Those land at `modules/Billing/Http/Controllers/StatementController.php` and `mo
 applies to any generator writing under the application directory; generators targeting `database/` (migrations,
 factories, seeders) are unaffected and still write to their usual location.
 
+### Model Factories
+
+Factories stay in `database/factories/`, grouped by module:
+
+```text
+database/factories/
+└── Billing/
+    └── InvoiceFactory.php    # Database\Factories\Billing\InvoiceFactory
+```
+
+`App\Billing\Models\Invoice` resolves to that factory with no wiring on the model, and so does
+`App\Billing\Invoice` if you keep models at the module root - the `Models` segment is not part of the factory name.
+Grouping by module means two modules can each own an `Invoice` without colliding.
+
+Models outside a module are untouched: `App\Models\User` still resolves to `Database\Factories\UserFactory`. A
+`#[UseFactory]` attribute on the model always wins, and a factory already sitting where Laravel's default would put it
+keeps being used, so adopting the package does not orphan existing factories.
+
 ### Artisan Commands
 
 | Command              | Description                                                 |

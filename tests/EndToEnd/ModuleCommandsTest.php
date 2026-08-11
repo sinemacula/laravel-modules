@@ -11,6 +11,7 @@ use SineMacula\Laravel\Modules\Console\Commands\ModuleClearCommand;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleListCommand;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleMakeCommand;
 use SineMacula\Laravel\Modules\Providers\ModuleServiceProvider;
+use Symfony\Component\Process\Process;
 use Tests\EndToEndTestCase;
 
 /**
@@ -110,5 +111,33 @@ final class ModuleCommandsTest extends EndToEndTestCase
 
         self::assertDirectoryExists($module . '/Listeners');
         self::assertFileExists($module . '/Http/routes.php');
+    }
+
+    /**
+     * Test that the PHP files module:make generates parse cleanly and open with
+     * the strict types declaration, so a new module does not start out in
+     * breach of the coding standard.
+     *
+     * @return void
+     */
+    public function testModuleMakeGeneratesStandardsCompliantFiles(): void
+    {
+        $this->runFixtureArtisan(['module:make', 'Auditing']);
+
+        $module = $this->fixtureAppPath . '/modules/Auditing';
+
+        foreach (['/Http/routes.php', '/Console/schedule.php'] as $file) {
+
+            $path     = $module . $file;
+            $contents = (string) file_get_contents($path);
+
+            self::assertStringStartsWith("<?php\n\ndeclare(strict_types = 1);\n", $contents);
+            self::assertDoesNotMatchRegularExpression('/^use /m', $contents);
+
+            $lint = new Process([PHP_BINARY, '-l', $path]);
+            $lint->run();
+
+            self::assertSame(0, $lint->getExitCode(), $lint->getOutput());
+        }
     }
 }

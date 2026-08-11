@@ -32,6 +32,34 @@ final class ModuleMakeCommand extends Command
         'Resources/views',
     ];
 
+    /** @var string The contents of the generated route file. */
+    private const string ROUTES_STUB = <<<'PHP'
+        <?php
+
+        declare(strict_types = 1);
+
+        // Register the module's routes here, for example:
+        //
+        // use Illuminate\Support\Facades\Route;
+        //
+        // Route::get('/example', [ExampleController::class, 'index']);
+
+        PHP;
+
+    /** @var string The contents of the generated schedule file. */
+    private const string SCHEDULE_STUB = <<<'PHP'
+        <?php
+
+        declare(strict_types = 1);
+
+        // Register the module's scheduled tasks here, for example:
+        //
+        // use Illuminate\Support\Facades\Schedule;
+        //
+        // Schedule::command('example:run')->daily();
+
+        PHP;
+
     /** @var string The name and signature of the console command. */
     protected $signature = 'module:make {name : The name of the module}';
 
@@ -136,12 +164,12 @@ final class ModuleMakeCommand extends Command
 
             $filesystem->put(
                 $modulePath . DIRECTORY_SEPARATOR . 'Http' . DIRECTORY_SEPARATOR . 'routes.php',
-                "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\n",
+                self::ROUTES_STUB,
             );
 
             $filesystem->put(
                 $modulePath . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'schedule.php',
-                "<?php\n\nuse Illuminate\\Support\\Facades\\Schedule;\n",
+                self::SCHEDULE_STUB,
             );
         } catch (\Throwable $exception) { // @phpstan-ignore catch.neverThrown
 

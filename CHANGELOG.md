@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.0](https://github.com/sinemacula/laravel-modules/compare/v1.3.0...v1.4.0) (2026-08-24)
+
+
+### Features
+
+* resolve module model factories by convention ([#66](https://github.com/sinemacula/laravel-modules/issues/66)) ([3ff5a8b](https://github.com/sinemacula/laravel-modules/commit/3ff5a8ba0869b14d815bbf905cdd24f2762b61d7))
+
+
+### Bug Fixes
+
+* generate standards-compliant module stubs ([#67](https://github.com/sinemacula/laravel-modules/issues/67)) ([0cfe518](https://github.com/sinemacula/laravel-modules/commit/0cfe5188bbcaf9793ad11954c0b611940c9c6093))
+* **qlty:** unblock cloud builds and install the git hooks reliably ([#64](https://github.com/sinemacula/laravel-modules/issues/64)) ([5f13fa1](https://github.com/sinemacula/laravel-modules/commit/5f13fa1123d44d271b03c1a102106c0b8d7e5257))
+
 ## [1.3.0](https://github.com/sinemacula/laravel-modules/compare/v1.2.0...v1.3.0) (2026-07-31)
 
 

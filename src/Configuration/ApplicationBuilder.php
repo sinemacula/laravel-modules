@@ -19,9 +19,9 @@ class ApplicationBuilder extends BaseApplicationBuilder
     /**
      * Register module-aware services for the application.
      *
-     * Discovers and registers event listeners, console commands, and schedule
-     * files from each module via glob-based discovery, then loads the
-     * application's configured service providers (bootstrap/providers.php).
+     * Registers the event listener, console command and schedule paths each
+     * module resolves to, then loads the application's configured service
+     * providers.
      *
      * @return static
      *

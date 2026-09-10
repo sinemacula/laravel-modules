@@ -959,8 +959,9 @@ final class ModulesTest extends TestCase
      */
     public function testDiscoverModulesReturnsEmptyWhenModulesDirectoryMissing(): void
     {
-        $baseWithoutModules = sys_get_temp_dir()
-            . DIRECTORY_SEPARATOR . 'no_modules_' . uniqid();
+        // Nested inside the canonical temporary root so parallel workers cannot
+        // collide on the path or tear down each other's directory.
+        $baseWithoutModules = $this->tempDir . DIRECTORY_SEPARATOR . 'no-modules';
 
         mkdir($baseWithoutModules, 0755, true);
 
@@ -969,8 +970,6 @@ final class ModulesTest extends TestCase
 
         self::assertSame([], Modules::getModules());
         self::assertSame([], Modules::routePaths());
-
-        rmdir($baseWithoutModules);
     }
 
     /**

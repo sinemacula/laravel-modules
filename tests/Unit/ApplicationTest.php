@@ -103,6 +103,48 @@ final class ApplicationTest extends TestCase
     }
 
     /**
+     * Test that the base path is canonicalised.
+     *
+     * @return void
+     */
+    public function testSetBasePathCanonicalisesTheGivenPath(): void
+    {
+        $app = new Application(
+            $this->tempDir . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR . '..',
+        );
+
+        // Listener discovery strips this value off each listener's real path,
+        // so the two spellings have to match exactly.
+        self::assertSame($this->tempDir, $app->basePath());
+    }
+
+    /**
+     * Test that a base path that cannot be resolved is kept as given.
+     *
+     * @return void
+     */
+    public function testSetBasePathKeepsAnUnresolvablePath(): void
+    {
+        $app = new Application('/no/such/directory');
+
+        self::assertSame('/no/such/directory', $app->basePath());
+    }
+
+    /**
+     * Test that an empty base path is not resolved to the working directory.
+     *
+     * @return void
+     */
+    public function testSetBasePathKeepsAnEmptyPath(): void
+    {
+        $app = new Application($this->tempDir);
+
+        $app->setBasePath('');
+
+        self::assertSame('', $app->basePath());
+    }
+
+    /**
      * Test that resourcePath returns the module path when Modules resolves a
      * non-empty resource path.
      *
@@ -129,11 +171,10 @@ final class ApplicationTest extends TestCase
      */
     public function testResourcePathFallsBackToParentWhenEmpty(): void
     {
-        $emptyDir = sys_get_temp_dir()
-            . DIRECTORY_SEPARATOR
-            . 'app_empty_' . uniqid();
+        // Nested inside the canonical temporary root, because the application
+        // now canonicalises its base path and the macOS temp root is a symlink.
+        $emptyDir = $this->tempDir . DIRECTORY_SEPARATOR . 'empty-app';
 
-        mkdir($emptyDir, 0755, true);
         mkdir($emptyDir . '/modules', 0755, true);
         mkdir($emptyDir . '/resources', 0755, true);
 
@@ -148,8 +189,6 @@ final class ApplicationTest extends TestCase
             $emptyDir . DIRECTORY_SEPARATOR . 'resources',
             $path,
         );
-
-        $this->removeDirectory($emptyDir);
     }
 
     /**

@@ -340,7 +340,7 @@ final class ModuleManifestTest extends TestCase
     }
 
     /**
-     * Test that a write failure is reported against the staging path.
+     * Test that a staging write failure is reported against the manifest path.
      *
      * @return void
      */
@@ -359,19 +359,125 @@ final class ModuleManifestTest extends TestCase
 
         $this->expectException(ModuleException::class);
         $this->expectExceptionMessage(
-            'Failed to write temporary manifest file at ' . $cacheDir . '/modules.php.tmp.',
+            'Failed to write the temporary manifest file at ' . $cacheDir . '/modules.php.' . getmypid() . '.tmp.',
         );
-
-        // Suppress the file_put_contents warning so PHPUnit sees the exception.
-        set_error_handler(static fn (): bool => true);
 
         try {
             $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
         } finally {
-            restore_error_handler();
-
             chmod($cacheDir, 0755);
         }
+    }
+
+    /**
+     * Test that a rename failure is reported against the manifest path.
+     *
+     * @return void
+     */
+    public function testWriteThrowsWhenTheManifestCannotBeRenamedIntoPlace(): void
+    {
+        // A non-empty directory in the manifest's place cannot be replaced by a
+        // rename, which is the failure a losing concurrent writer sees.
+        mkdir($this->manifestPath, 0755, true);
+        touch($this->manifestPath . '/occupied');
+
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage('Failed to write the manifest file at ' . $this->manifestPath . '.');
+
+        $this->manifest()->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+    }
+
+    /**
+     * Test that a failed rename leaves no staging file behind.
+     *
+     * @return void
+     */
+    public function testWriteRemovesTheStagingFileWhenTheRenameFails(): void
+    {
+        mkdir($this->manifestPath, 0755, true);
+        touch($this->manifestPath . '/occupied');
+
+        try {
+            $this->manifest()->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        } catch (ModuleException) {
+            // The cleanup, not the exception, is under test here.
+        }
+
+        self::assertSame([], glob($this->manifestPath . '.*.tmp'));
+    }
+
+    /**
+     * Test that write creates the manifest directory when it is missing.
+     *
+     * @return void
+     */
+    public function testWriteCreatesTheManifestDirectory(): void
+    {
+        $manifestPath = $this->tempDir . '/missing/cache/modules.php';
+
+        $manifest = new ModuleManifest($manifestPath, $this->modulesPath);
+
+        // Neutralise the umask so the created mode is the one that was asked
+        // for, not the one the environment happens to allow.
+        $umask = umask(0);
+
+        try {
+            $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        } finally {
+            umask($umask);
+        }
+
+        self::assertFileExists($manifestPath);
+        self::assertSame(['alpha' => '/somewhere/alpha'], $manifest->read());
+        self::assertSame('0755', substr(sprintf('%o', fileperms(dirname($manifestPath))), -4));
+    }
+
+    /**
+     * Test that write reports a manifest directory that cannot be created.
+     *
+     * @return void
+     */
+    public function testWriteThrowsWhenTheManifestDirectoryCannotBeCreated(): void
+    {
+        if (posix_geteuid() === 0) {
+            self::markTestSkipped('Permissions are not enforced for the superuser.');
+        }
+
+        $parent = $this->tempDir . '/readonly-parent';
+
+        mkdir($parent, 0755, true);
+        chmod($parent, 0444);
+
+        $manifest = new ModuleManifest($parent . '/cache/modules.php', $this->modulesPath);
+
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage('Failed to create the manifest directory at ' . $parent . '/cache.');
+
+        try {
+            $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        } finally {
+            chmod($parent, 0755);
+        }
+    }
+
+    /**
+     * Test that writers do not stage through a shared path.
+     *
+     * @return void
+     */
+    public function testWriteDoesNotStageThroughASharedPath(): void
+    {
+        // Stand in for the staging file of a concurrent writer. A shared path
+        // would see it overwritten and then renamed away.
+        $shared = $this->manifestPath . '.tmp';
+
+        file_put_contents($shared, 'reserved');
+
+        $this->manifest()->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+
+        self::assertFileExists($this->manifestPath);
+        self::assertSame('reserved', file_get_contents($shared));
+        self::assertSame([], glob($this->manifestPath . '.*.tmp'));
     }
 
     /**

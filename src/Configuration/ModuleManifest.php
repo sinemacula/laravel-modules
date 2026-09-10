@@ -80,6 +80,10 @@ final readonly class ModuleManifest
      * appearing while discovery is in progress invalidates the manifest rather
      * than being paired with a signature taken after it landed.
      *
+     * Every filesystem call is suppressed and checked, because the framework
+     * promotes warnings to exceptions, which would escape ahead of the failure
+     * reported here.
+     *
      * @param  \Closure(): array<string, string>  $discover
      * @return void
      *
@@ -92,19 +96,32 @@ final readonly class ModuleManifest
             'modules'   => $discover(),
         ];
 
-        $content  = "<?php\nreturn " . var_export($manifest, true) . ';';
-        $tempPath = $this->path . '.tmp';
+        $content   = "<?php\nreturn " . var_export($manifest, true) . ';';
+        $directory = dirname($this->path);
 
-        if (file_put_contents($tempPath, $content) === false) {
-            throw new ModuleException('Failed to write temporary manifest file at ' . $tempPath . '.');
+        // mkdir also reports failure for a directory that already exists, so
+        // the outcome is confirmed rather than trusted.
+        if (!@mkdir($directory, 0755, true) && !is_dir($directory)) {
+            throw new ModuleException('Failed to create the manifest directory at ' . $directory . '.');
         }
 
-        if (!rename($tempPath, $this->path)) { // @codeCoverageIgnoreStart
+        // A shared staging path lets concurrent writers rename each other's
+        // file away, so each process stages through a path of its own.
+        $tempPath = $this->path . '.' . getmypid() . '.tmp';
+
+        if (@file_put_contents($tempPath, $content) === false) {
 
             @unlink($tempPath);
 
-            throw new ModuleException('Failed to write manifest file at ' . $this->path . '.');
-        } // @codeCoverageIgnoreEnd
+            throw new ModuleException('Failed to write the temporary manifest file at ' . $tempPath . '.');
+        }
+
+        if (!@rename($tempPath, $this->path)) {
+
+            @unlink($tempPath);
+
+            throw new ModuleException('Failed to write the manifest file at ' . $this->path . '.');
+        }
     }
 
     /**

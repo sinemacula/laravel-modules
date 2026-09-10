@@ -33,6 +33,33 @@ final class Application extends BaseApplication
     }
 
     /**
+     * Set the base path for the application.
+     *
+     * The path is canonicalised where it resolves, so that it agrees with the
+     * canonical paths module discovery returns. Listener discovery derives a
+     * class name by stripping this value off each file's real path, which
+     * strips nothing when the two are spelled differently, and the resulting
+     * failure is swallowed by the framework.
+     *
+     * phpcs:disable Squiz.Commenting.FunctionComment.ScalarTypeHintMissing
+     *
+     * @param  string  $basePath
+     * @return $this
+     */
+    #[\Override]
+    public function setBasePath($basePath)
+    {
+        // phpcs:enable
+        // realpath('') resolves to the working directory rather than failing,
+        // so an empty path is kept as given.
+        if ($basePath !== '') {
+            $basePath = realpath($basePath) ?: $basePath;
+        }
+
+        return parent::setBasePath($basePath);
+    }
+
+    /**
      * Get the path to the resources directory.
      *
      * Supports module-scoped paths using the {module}::{path} format. When a

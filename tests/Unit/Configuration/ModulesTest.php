@@ -381,15 +381,13 @@ final class ModulesTest extends TestCase
         Modules::setBasePath(dirname($cacheDir, 2));
 
         $this->expectException(ModuleException::class);
-        $this->expectExceptionMessage('Failed to write temporary manifest file at ' . $cachePath . '.tmp.');
-
-        // Suppress the file_put_contents warning so PHPUnit sees the exception.
-        set_error_handler(static fn (): bool => true);
+        $this->expectExceptionMessage(
+            'Failed to write the temporary manifest file at ' . $cachePath . '.' . getmypid() . '.tmp.',
+        );
 
         try {
             Modules::cache();
         } finally {
-            restore_error_handler();
 
             // Restore permissions so tearDown can clean up.
             chmod($cacheDir, 0755);
@@ -1195,8 +1193,8 @@ final class ModulesTest extends TestCase
 
         self::assertFileExists($cachePath);
 
-        // The temp file should not persist after a successful cache
-        self::assertFileDoesNotExist($cachePath . '.tmp');
+        // No staging file should persist after a successful cache
+        self::assertSame([], glob($cachePath . '.*.tmp'));
     }
 
     /**

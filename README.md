@@ -372,7 +372,8 @@ composer bench:smoke         # single-rev pass to verify every subject runs
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for a list of notable changes.
+See [CHANGELOG.md](CHANGELOG.md) for a list of notable changes, and
+[UPGRADING.md](UPGRADING.md) for what an application has to do when moving between minor versions.
 
 ## Contributing
 

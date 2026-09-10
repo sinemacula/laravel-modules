@@ -714,17 +714,38 @@ final class ModulesTest extends TestCase
     }
 
     /**
-     * Test that resourcePath returns an empty string for an unknown module.
+     * Test that resourcePath reports an unknown module rather than resolving
+     * somewhere else.
      *
      * @return void
      */
-    public function testResourcePathReturnsEmptyForUnknownModule(): void
+    public function testResourcePathThrowsForAnUnknownModule(): void
     {
         Modules::setBasePath($this->tempDir);
 
-        $path = Modules::resourcePath('nonexistent::path');
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage('Unknown module [nonexistent].');
 
-        self::assertSame('', $path);
+        Modules::resourcePath('nonexistent::path');
+    }
+
+    /**
+     * Test that resourcePath reports a known module holding no resources.
+     *
+     * @return void
+     */
+    public function testResourcePathThrowsForAModuleWithNoResources(): void
+    {
+        // Every fixture module owns a Resources directory, so this one is
+        // staged without it.
+        $this->createDirectory('modules/gamma/Http');
+
+        Modules::setBasePath($this->tempDir);
+
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage('Module [gamma] has no resources directory.');
+
+        Modules::resourcePath('gamma::views');
     }
 
     /**

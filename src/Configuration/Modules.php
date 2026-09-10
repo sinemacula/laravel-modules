@@ -137,8 +137,11 @@ final class Modules
     /**
      * Get the path to a module's resources directory.
      *
-     * A module can be specified using the {module}::{path} format. When no
-     * module prefix is present, the default module is used.
+     * A module can be specified using the {module}::{path} format. That prefix
+     * is an assertion about ownership, so one naming a module that has no
+     * resources to serve is reported rather than resolved somewhere else. An
+     * empty string is returned only for the default module, which the
+     * application falls back on.
      *
      * @param  string  $path
      * @return string
@@ -147,12 +150,23 @@ final class Modules
      */
     public static function resourcePath(string $path = ''): string
     {
-        $module = self::extractModuleFromPath($path)
-            ?? self::DEFAULT_MODULE;
+        $module = self::extractModuleFromPath($path);
+        $paths  = self::resolvePaths(ModulePath::RESOURCES->value);
 
-        return self::resolvePaths(
-            ModulePath::RESOURCES->value,
-        )[$module] ?? '';
+        if ($module === null) {
+            return $paths[self::DEFAULT_MODULE] ?? '';
+        }
+
+        if (!isset($paths[$module])) {
+
+            $reason = self::getModule($module) === null
+                ? 'Unknown module [' . $module . '].'
+                : 'Module [' . $module . '] has no resources directory.';
+
+            throw new ModuleException($reason);
+        }
+
+        return $paths[$module];
     }
 
     /**

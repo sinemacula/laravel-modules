@@ -311,6 +311,10 @@ without one it uses the default module, `Foundation`:
 resource_path('billing::views');  // <base>/modules/Billing/Resources/views
 ```
 
+The prefix is an assertion about ownership, so a mistyped module name is an error rather than a silent fallback:
+both a module that does not exist and one with no `Resources/` directory raise `ModuleException`. Only the
+unprefixed form falls back to `<base>/resources`, which is what an application without a default module needs.
+
 This has a consequence worth knowing before you create `modules/Foundation/Resources/`. Because Laravel binds the
 container paths through the same method, that directory becomes the application's resource root as soon as it exists:
 

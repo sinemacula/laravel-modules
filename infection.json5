@@ -23,6 +23,16 @@
             ignore: [
                 "SineMacula\\Laravel\\Modules\\Configuration\\Modules::resolvePaths"
             ]
+        },
+        // Equivalent mutant. The early return only fires when the factory sits
+        // directly in the factory namespace, leaving nothing to name a model
+        // with, so the fall-through builds candidate names ending in a
+        // namespace separator - a shape no class name can take - and resolution
+        // reaches the same fallback either way.
+        ReturnRemoval: {
+            ignore: [
+                "SineMacula\\Laravel\\Modules\\Database\\FactoryResolver::moduleModelNames"
+            ]
         }
     }
 }

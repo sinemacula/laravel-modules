@@ -34,10 +34,10 @@ final class SpyApplicationBuilder extends ApplicationBuilder
     /**
      * Record that withKernels was called.
      *
-     * @return static
+     * @return self
      */
     #[\Override]
-    public function withKernels(): static
+    public function withKernels(): self
     {
         $this->withKernelsCalled = true;
 
@@ -48,10 +48,10 @@ final class SpyApplicationBuilder extends ApplicationBuilder
      * Capture event discovery paths.
      *
      * @param  bool|iterable<string>  $discover
-     * @return static
+     * @return self
      */
     #[\Override]
-    public function withEvents(bool|iterable $discover = true): static
+    public function withEvents(bool|iterable $discover = true): self
     {
         if (is_iterable($discover)) {
             $this->capturedEvents = [...$discover];
@@ -64,10 +64,10 @@ final class SpyApplicationBuilder extends ApplicationBuilder
      * Capture command paths.
      *
      * @param  array<int, string>  $commands
-     * @return static
+     * @return self
      */
     #[\Override]
-    public function withCommands(array $commands = []): static
+    public function withCommands(array $commands = []): self
     {
         $this->capturedCommands = $commands;
 
@@ -79,10 +79,10 @@ final class SpyApplicationBuilder extends ApplicationBuilder
      *
      * @param  array<int, string>  $providers
      * @param  bool  $bootstrap
-     * @return static
+     * @return self
      */
     #[\Override]
-    public function withProviders(array $providers = [], bool $bootstrap = true): static
+    public function withProviders(array $providers = [], bool $bootstrap = true): self
     {
         $this->withProvidersCalled = true;
 

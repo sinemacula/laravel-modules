@@ -12,8 +12,8 @@ parameters:
         - tests
 
     # SpyApplicationBuilder is a test double that subclasses the framework's
-    # application builder. Its overrides deliberately declare a `static` return
-    # and simplified array parameters, which trip phpstan's covariance checks.
+    # application builder. Its overrides narrow the return to the spy itself and
+    # simplify the array parameters, which trip phpstan's covariance checks.
     ignoreErrors:
         -
             identifier: method.childReturnType

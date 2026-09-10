@@ -114,13 +114,9 @@ final class ModuleCacheCommandTest extends TestCase
 
         $output = new BufferedOutput;
 
-        // Suppress the file_put_contents warning so PHPUnit sees the result.
-        set_error_handler(static fn (): bool => true);
-
         try {
             $exitCode = $command->run(new ArrayInput([]), $output);
         } finally {
-            restore_error_handler();
 
             // Restore permissions so tearDown can clean up.
             chmod($cacheDir, 0755);

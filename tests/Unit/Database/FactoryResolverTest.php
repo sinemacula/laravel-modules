@@ -20,9 +20,10 @@ use SineMacula\Laravel\Modules\Database\FactoryResolver;
  * Unit tests for the FactoryResolver class.
  *
  * The resolver reads the application namespace from the container, so every
- * test runs against a container it controls. With nothing bound, resolution
- * falls back to the framework's own default of App\, which is what the fixture
- * classes are namespaced under.
+ * test runs against a container it controls. Most bind nothing and lean on the
+ * framework's own fallback of App\, which is what the fixture classes are
+ * namespaced under; the cases that turn on the namespace itself bind an
+ * application reporting one.
  *
  * @author      Ben Carey <bdmc@sinemacula.co.uk>
  * @copyright   2026 Sine Macula Limited
@@ -211,15 +212,45 @@ final class FactoryResolverTest extends TestCase
      */
     public function testAnUnscopedFactoryResolvesThroughTheApplicationModelsDirectory(): void
     {
-        $application = self::createStub(Application::class);
-
-        $application->method('getNamespace')->willReturn('App\Billing\\');
-
-        Container::getInstance()->instance(Application::class, $application);
+        $this->bindApplicationNamespace('App\Billing\\');
 
         self::assertSame(
             'App\Billing\Models\Invoice',
             FactoryResolver::modelNameFor(new RootInvoiceFactory),
+        );
+    }
+
+    /**
+     * Test that the module scheme follows the application namespace, so an
+     * application not rooted at App\ resolves in both directions.
+     *
+     * @return void
+     */
+    public function testResolutionFollowsTheApplicationNamespace(): void
+    {
+        $this->bindApplicationNamespace('Acme\\');
+
+        self::assertSame(
+            InvoiceFactory::class,
+            FactoryResolver::factoryNameFor('Acme\Billing\Models\Invoice'),
+        );
+
+        self::assertSame('Acme\Invoice', FactoryResolver::modelNameFor(new InvoiceFactory));
+    }
+
+    /**
+     * Test that the Models directory is stripped relative to the application
+     * namespace, not wherever the segment first appears.
+     *
+     * @return void
+     */
+    public function testTheModelsDirectoryIsStrippedRelativeToTheApplicationNamespace(): void
+    {
+        $this->bindApplicationNamespace('App\Models\\');
+
+        self::assertSame(
+            'Database\Factories\InvoiceFactory',
+            FactoryResolver::factoryNameFor('App\Models\Models\Invoice'),
         );
     }
 
@@ -240,5 +271,20 @@ final class FactoryResolverTest extends TestCase
 
         self::assertSame(InvoiceFactory::class, Factory::resolveFactoryName('App\Billing\Models\Invoice'));
         self::assertSame('App\Billing\Models\Invoice', (new InvoiceFactory)->modelName());
+    }
+
+    /**
+     * Bind an application reporting the given namespace to the container.
+     *
+     * @param  string  $namespace
+     * @return void
+     */
+    private function bindApplicationNamespace(string $namespace): void
+    {
+        $application = self::createStub(Application::class);
+
+        $application->method('getNamespace')->willReturn($namespace);
+
+        Container::getInstance()->instance(Application::class, $application);
     }
 }

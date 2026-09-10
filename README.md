@@ -104,7 +104,12 @@ php artisan make:model "App\Billing\Models\Invoice"
 
 Those land at `modules/Billing/Http/Controllers/StatementController.php` and `modules/Billing/Models/Invoice.php`. This
 applies to any generator writing under the application directory; generators targeting `database/` (migrations,
-factories, seeders) are unaffected and still write to their usual location.
+factories, seeders) are unaffected and still write to their usual location. `make:factory` does still guess the model
+from the factory name, and that guess does not know about modules, so pass it explicitly:
+
+```bash
+php artisan make:factory Billing/InvoiceFactory --model "App\Billing\Models\Invoice"
+```
 
 ### Model Factories
 
@@ -123,6 +128,12 @@ Grouping by module means two modules can each own an `Invoice` without colliding
 Models outside a module are untouched: `App\Models\User` still resolves to `Database\Factories\UserFactory`. A
 `#[UseFactory]` attribute on the model always wins, and a factory already sitting where Laravel's default would put it
 keeps being used, so adopting the package does not orphan existing factories.
+
+One name to watch: a model nested under the application's own `Models` directory shares a module model's factory name,
+so `App\Models\Billing\Invoice` and `App\Billing\Models\Invoice` both resolve to
+`Database\Factories\Billing\InvoiceFactory`, and the module model wins the way back. Laravel collides the first of
+those with `App\Billing\Invoice` on its own, so this is one more name in an existing set rather than a new hazard.
+Name one of them differently, or pin it with `#[UseFactory]`.
 
 ### Artisan Commands
 

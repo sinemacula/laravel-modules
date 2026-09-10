@@ -301,15 +301,11 @@ final class ModulesIntegrationTest extends TestCase
 
         self::assertArrayHasKey('alpha', $routesAfter);
 
-        $modulesPath = Modules::modulesPath();
-        self::assertDirectoryExists(
-            $modulesPath . DIRECTORY_SEPARATOR . 'alpha',
-        );
-        self::assertDirectoryExists(
-            $modulesPath . DIRECTORY_SEPARATOR . 'beta',
-        );
-        self::assertDirectoryExists(
-            $modulesPath . DIRECTORY_SEPARATOR . 'gamma',
+        // The cache named alpha alone, so the other two are what prove
+        // discovery ran again rather than being served from it.
+        self::assertSame(
+            ['alpha', 'beta', 'gamma'],
+            array_keys(Modules::getModules()),
         );
     }
 

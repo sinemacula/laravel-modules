@@ -160,9 +160,7 @@ final readonly class ModuleManifest
     /**
      * Load the manifest file and validate its shape.
      *
-     * A file that cannot be parsed is treated as absent. The signature key must
-     * be present, but may hold the null recorded for a modules directory that
-     * could not be read when the manifest was written.
+     * A file that cannot be parsed is treated as absent.
      *
      * @return array{signature: string|null, modules: array<string, string>}|null
      *
@@ -195,11 +193,12 @@ final readonly class ModuleManifest
             return null;
         }
 
-        if (!array_key_exists('signature', $manifest)) {
-            return null;
-        }
-
-        if ($manifest['signature'] !== null && !is_string($manifest['signature'])) {
+        // The signature key must be present, but may hold the null recorded for
+        // a modules directory that could not be read when it was written.
+        if (
+            !array_key_exists('signature', $manifest)
+            || ($manifest['signature'] !== null && !is_string($manifest['signature']))
+        ) {
             return null;
         }
 

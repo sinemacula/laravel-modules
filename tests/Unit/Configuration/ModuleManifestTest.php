@@ -254,7 +254,7 @@ final class ModuleManifestTest extends TestCase
             $this->manifestPath,
             "<?php\nreturn " . var_export([
                 'signature' => 123,
-                'modules'   => ['alpha' => '/somewhere/alpha'],
+                'modules'   => ['alpha' => $this->modulesPath . '/alpha'],
             ], true) . ';',
         );
 
@@ -273,7 +273,9 @@ final class ModuleManifestTest extends TestCase
 
         file_put_contents(
             $this->manifestPath,
-            "<?php\nreturn " . var_export(['modules' => ['alpha' => '/somewhere/alpha']], true) . ';',
+            "<?php\nreturn " . var_export(['modules' => [
+                'alpha' => $this->modulesPath . '/alpha',
+            ]], true) . ';',
         );
 
         self::assertNull($manifest->read());
@@ -329,7 +331,10 @@ final class ModuleManifestTest extends TestCase
             $this->manifestPath,
             "<?php\nreturn " . var_export([
                 'signature' => $signature,
-                'modules'   => ['alpha' => '/somewhere/alpha', 'beta' => ['nested']],
+                'modules'   => [
+                    'alpha' => $this->modulesPath . '/alpha',
+                    'beta'  => ['nested'],
+                ],
             ], true) . ';',
         );
 

@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Tests\Unit\Configuration;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use SineMacula\Laravel\Modules\Configuration\ModuleManifest;
 use SineMacula\Laravel\Modules\Configuration\Modules;
@@ -213,7 +212,10 @@ final class ModulesTest extends TestCase
 
         try {
             setlocale(LC_COLLATE, 'en_US.UTF-8', 'en_US.utf8', 'C');
-            $this->resetModulesState();
+
+            // Discard the memoised map only; discovery has to run again under
+            // the new collation, against the same base path.
+            Modules::flush();
 
             self::assertSame($under, array_keys(Modules::getModules()));
         } finally {
@@ -325,12 +327,49 @@ final class ModulesTest extends TestCase
     }
 
     /**
+     * Test that a null base path returns the resolver to its uninitialised
+     * state, so resolution fails the way it does before one has ever been set.
+     *
+     * @return void
+     */
+    public function testANullBasePathDiscardsTheCurrentOne(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        self::assertNotSame([], Modules::getModules());
+
+        Modules::setBasePath(null);
+
+        $this->expectException(ModuleException::class);
+        $this->expectExceptionMessage('No base path has been set.');
+
+        Modules::modulesPath();
+    }
+
+    /**
+     * Test that flush keeps the base path, which the caching commands resolve
+     * against after flushing.
+     *
+     * @return void
+     */
+    public function testFlushKeepsTheBasePath(): void
+    {
+        Modules::setBasePath($this->tempDir);
+
+        Modules::flush();
+
+        self::assertSame(
+            $this->tempDir . DIRECTORY_SEPARATOR . 'modules',
+            Modules::modulesPath(),
+        );
+    }
+
+    /**
      * Test that modulesPath throws a ModuleException when the base path has not
      * been set.
      *
      * @return void
      */
-    #[RunInSeparateProcess]
     public function testModulesPathThrowsWhenBasePathNotSet(): void
     {
         $this->expectException(ModuleException::class);

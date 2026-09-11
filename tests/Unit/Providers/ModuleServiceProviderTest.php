@@ -12,7 +12,6 @@ use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Support\Facades\Facade;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use SineMacula\Laravel\Modules\Configuration\Modules;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleCacheCommand;
@@ -383,7 +382,6 @@ final class ModuleServiceProviderTest extends TestCase
      *
      * @return void
      */
-    #[RunInSeparateProcess]
     public function testRegisterSetsBasePathFromApplication(): void
     {
         $app = $this->createApplication(new ConfigRepository);

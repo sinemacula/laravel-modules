@@ -63,6 +63,10 @@ works via PSR-4 autoloading. No registration required.
 Discovery is per-path and tolerant: a module without a `Listeners/` directory simply does not appear in the listener
 map. Nothing needs to exist beyond the module directory itself.
 
+That directory does have to be real. A symlinked module - or a `modules/` directory that is itself a link - raises
+`ModuleException` at discovery, because Laravel derives command and listener class names from each discovered file's
+real path, so a module reached through a link would register its resources but none of its classes.
+
 Service providers work exactly as they do in a standard Laravel app: register them in `bootstrap/providers.php`. The
 package does not auto-discover module providers, so you keep full control over their registration order.
 
@@ -305,6 +309,7 @@ not have the directory or file in question:
 | `Modules::listenerPaths()`   | Module name to `Listeners/`                            |
 | `Modules::commandPaths()`    | Module name to `Console/Commands/`                     |
 | `Modules::schedulePaths()`   | Module name to `Console/schedule.php`                  |
+| `Modules::resourcePath()`    | One module's `Resources/`, or the default module's     |
 | `Modules::defaultModule()`   | The module unprefixed resources resolve against        |
 | `Modules::flush()`           | Nothing - discards the memoised maps                   |
 
@@ -347,9 +352,6 @@ That is the intended behaviour of a default module, but it moves the Vite root a
 `module:make Foundation` deliberately does not create `Resources/`. Add it by hand when you want the application's own
 assets to live inside the module.
 
-A module prefix that does not resolve - a typo, or a module with no `Resources/` directory - falls back to the
-framework path rather than raising an error.
-
 ## Requirements
 
 - PHP ^8.3
@@ -360,7 +362,7 @@ framework path rather than raising an error.
 ```bash
 composer test                # PHPUnit suite in parallel via Paratest
 composer test:coverage       # suite with Clover coverage output
-composer test:mutation       # Infection mutation gate (min MSI 90)
+composer test:mutation       # Infection mutation gate (min MSI 95)
 composer test:mutation:full  # full mutation suite without thresholds
 composer check               # static analysis and lint via qlty
 composer format              # format via qlty

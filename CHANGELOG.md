@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.4.0](https://github.com/sinemacula/laravel-modules/compare/v1.3.0...v1.4.0) (2026-09-11)
+
+
+### Features
+
+* allow the module base path to be discarded ([#78](https://github.com/sinemacula/laravel-modules/issues/78)) ([5ded49b](https://github.com/sinemacula/laravel-modules/commit/5ded49b23327847d59db8907cf503582db0d6481))
+* resolve module model factories by convention ([#66](https://github.com/sinemacula/laravel-modules/issues/66)) ([3ff5a8b](https://github.com/sinemacula/laravel-modules/commit/3ff5a8ba0869b14d815bbf905cdd24f2762b61d7))
+
+
+### Bug Fixes
+
+* canonicalise the application base path ([#70](https://github.com/sinemacula/laravel-modules/issues/70)) ([bba80b6](https://github.com/sinemacula/laravel-modules/commit/bba80b6c007b655797db2c1072374279013709c3))
+* generate standards-compliant module stubs ([#67](https://github.com/sinemacula/laravel-modules/issues/67)) ([0cfe518](https://github.com/sinemacula/laravel-modules/commit/0cfe5188bbcaf9793ad11954c0b611940c9c6093))
+* **qlty:** unblock cloud builds and install the git hooks reliably ([#64](https://github.com/sinemacula/laravel-modules/issues/64)) ([5f13fa1](https://github.com/sinemacula/laravel-modules/commit/5f13fa1123d44d271b03c1a102106c0b8d7e5257))
+* report a resource path that names a module with nothing to serve ([#72](https://github.com/sinemacula/laravel-modules/issues/72)) ([9516af0](https://github.com/sinemacula/laravel-modules/commit/9516af0d083157ae496adfdb26c80248e6c80d43))
+* report module cache write failures instead of crashing ([#69](https://github.com/sinemacula/laravel-modules/issues/69)) ([f7fdb03](https://github.com/sinemacula/laravel-modules/commit/f7fdb03ac89dc1f588493f42c180cb82ffa91d18))
+
 ## [1.3.0](https://github.com/sinemacula/laravel-modules/compare/v1.2.0...v1.3.0) (2026-07-31)
 
 

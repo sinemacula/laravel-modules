@@ -179,7 +179,8 @@ final class ApplicationTest extends TestCase
         mkdir($emptyDir . '/resources', 0755, true);
 
         Modules::setBasePath($emptyDir);
-        $this->resetModulesState();
+
+        Modules::flush();
 
         $app = new Application($emptyDir);
 

@@ -94,9 +94,9 @@ final class ModuleManifestTest extends TestCase
     {
         $manifest = $this->manifest();
 
-        $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
 
-        self::assertSame(['alpha' => '/somewhere/alpha'], $manifest->read());
+        self::assertSame(['alpha' => $this->modulesPath . '/alpha'], $manifest->read());
     }
 
     /**
@@ -109,7 +109,7 @@ final class ModuleManifestTest extends TestCase
     {
         $manifest = $this->manifest();
 
-        $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
 
         mkdir($this->modulesPath . '/beta', 0755, true);
 
@@ -126,7 +126,7 @@ final class ModuleManifestTest extends TestCase
     {
         $manifest = $this->manifest();
 
-        $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
 
         rmdir($this->modulesPath . '/alpha');
 
@@ -146,18 +146,18 @@ final class ModuleManifestTest extends TestCase
         mkdir($foreign . '/alpha', 0755, true);
 
         (new ModuleManifest($this->manifestPath, $foreign))
-            ->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+            ->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
 
         self::assertNull($this->manifest()->read());
     }
 
     /**
-     * Test that a manifest is honoured when the modules directory cannot be
-     * read, because an unknown signature is not a stale one.
+     * Test that a manifest is discarded when the modules directory cannot be
+     * read, since none of the paths it names resolve.
      *
      * @return void
      */
-    public function testReadReturnsModulesWhenTheModulesDirectoryIsUnreadable(): void
+    public function testReadDiscardsTheManifestWhenTheModulesDirectoryIsUnreadable(): void
     {
         if (posix_geteuid() === 0) {
             self::markTestSkipped('Permissions are not enforced for the superuser.');
@@ -165,15 +165,44 @@ final class ModuleManifestTest extends TestCase
 
         $manifest = $this->manifest();
 
-        $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
 
         chmod($this->modulesPath, 0000);
 
         try {
-            self::assertSame(['alpha' => '/somewhere/alpha'], $manifest->read());
+            self::assertNull($manifest->read());
         } finally {
             chmod($this->modulesPath, 0755);
         }
+    }
+
+    /**
+     * Test that a manifest naming a module that is no longer there is discarded
+     * rather than reporting a module with nothing behind it.
+     *
+     * @return void
+     */
+    public function testReadDiscardsTheManifestWhenAModulePathIsGone(): void
+    {
+        $manifest = $this->manifest();
+
+        // A manifest written in one root and read in another, which is what a
+        // build stage or a shared cache directory produces.
+        $manifest->write(static fn (): array => ['alpha' => '/build/app/modules/Alpha']);
+
+        self::assertNull($manifest->read());
+    }
+
+    /**
+     * Test that a manifest that cannot be parsed is treated as absent.
+     *
+     * @return void
+     */
+    public function testReadDiscardsAManifestThatCannotBeParsed(): void
+    {
+        file_put_contents($this->manifestPath, "<?php\nreturn [ this is not php ;");
+
+        self::assertNull($this->manifest()->read());
     }
 
     /**
@@ -186,9 +215,9 @@ final class ModuleManifestTest extends TestCase
     {
         $manifest = new ModuleManifest($this->manifestPath, $this->tempDir . '/missing');
 
-        $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
 
-        self::assertSame(['alpha' => '/somewhere/alpha'], $manifest->read());
+        self::assertSame(['alpha' => $this->modulesPath . '/alpha'], $manifest->read());
     }
 
     /**
@@ -202,7 +231,7 @@ final class ModuleManifestTest extends TestCase
         $modules  = $this->tempDir . '/missing';
         $manifest = new ModuleManifest($this->manifestPath, $modules);
 
-        $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
 
         mkdir($modules, 0755, true);
 
@@ -333,7 +362,10 @@ final class ModuleManifestTest extends TestCase
 
             mkdir($this->modulesPath . '/beta', 0755, true);
 
-            return ['alpha' => '/somewhere/alpha', 'beta' => '/somewhere/beta'];
+            return [
+                'alpha' => $this->modulesPath . '/alpha',
+                'beta'  => $this->modulesPath . '/beta',
+            ];
         });
 
         self::assertNull($manifest->read());
@@ -363,7 +395,7 @@ final class ModuleManifestTest extends TestCase
         );
 
         try {
-            $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+            $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
         } finally {
             chmod($cacheDir, 0755);
         }
@@ -384,7 +416,7 @@ final class ModuleManifestTest extends TestCase
         $this->expectException(ModuleException::class);
         $this->expectExceptionMessage('Failed to write the manifest file at ' . $this->manifestPath . '.');
 
-        $this->manifest()->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        $this->manifest()->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
     }
 
     /**
@@ -398,7 +430,7 @@ final class ModuleManifestTest extends TestCase
         touch($this->manifestPath . '/occupied');
 
         try {
-            $this->manifest()->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+            $this->manifest()->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
         } catch (ModuleException) {
             // The cleanup, not the exception, is under test here.
         }
@@ -422,13 +454,13 @@ final class ModuleManifestTest extends TestCase
         $umask = umask(0);
 
         try {
-            $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+            $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
         } finally {
             umask($umask);
         }
 
         self::assertFileExists($manifestPath);
-        self::assertSame(['alpha' => '/somewhere/alpha'], $manifest->read());
+        self::assertSame(['alpha' => $this->modulesPath . '/alpha'], $manifest->read());
         self::assertSame('0755', substr(sprintf('%o', fileperms(dirname($manifestPath))), -4));
     }
 
@@ -454,7 +486,7 @@ final class ModuleManifestTest extends TestCase
         $this->expectExceptionMessage('Failed to create the manifest directory at ' . $parent . '/cache.');
 
         try {
-            $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+            $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
         } finally {
             chmod($parent, 0755);
         }
@@ -473,7 +505,7 @@ final class ModuleManifestTest extends TestCase
 
         file_put_contents($shared, 'reserved');
 
-        $this->manifest()->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        $this->manifest()->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
 
         self::assertFileExists($this->manifestPath);
         self::assertSame('reserved', file_get_contents($shared));
@@ -489,7 +521,7 @@ final class ModuleManifestTest extends TestCase
     {
         $manifest = $this->manifest();
 
-        $manifest->write(static fn (): array => ['alpha' => '/somewhere/alpha']);
+        $manifest->write(fn (): array => ['alpha' => $this->modulesPath . '/alpha']);
 
         self::assertTrue($manifest->delete());
         self::assertFileDoesNotExist($this->manifestPath);

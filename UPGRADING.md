@@ -61,6 +61,16 @@ module are untouched.
 php artisan make:factory Billing/InvoiceFactory --model "App\Billing\Models\Invoice"
 ```
 
+### A manifest that cannot be used rebuilds itself
+
+The cached manifest is now discarded, and discovery runs instead, whenever it names a path that is no longer there or
+the file itself will not parse. Previously either state was served as-is, so an application could boot reporting
+modules while every route, view and translation path behind them was empty, with nothing in the log.
+
+The common way to reach it was a manifest written in one root and read in another, such as a `module:cache` run during
+a container build, or a `bootstrap/cache` shared across release directories. No action is needed; the first boot after
+upgrading rebuilds it.
+
 ### Generated modules changed shape
 
 `module:make` emits stubs conforming to the current coding standards. Existing modules are untouched; only newly

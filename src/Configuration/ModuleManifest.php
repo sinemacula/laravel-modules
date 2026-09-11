@@ -48,9 +48,10 @@ final readonly class ModuleManifest
      * Return the cached module paths, or null when the manifest cannot be used.
      *
      * The manifest is only honoured while it still describes the modules
-     * directory it was written for. One written before a module was added,
-     * removed or renamed is discarded in favour of discovery, so route and
-     * event caches can never be built from a superseded module set.
+     * directory it was written for, and while every path it names is still
+     * there. One written before a module was added, removed or renamed is
+     * discarded in favour of discovery, so route and event caches can never be
+     * built from a superseded module set.
      *
      * @return array<string, string>|null
      */
@@ -70,7 +71,9 @@ final readonly class ModuleManifest
             return null;
         }
 
-        return $manifest['modules'];
+        return $this->pathsResolve($manifest['modules'])
+            ? $manifest['modules']
+            : null;
     }
 
     /**
@@ -135,10 +138,31 @@ final readonly class ModuleManifest
     }
 
     /**
+     * Return whether every path the manifest names is still a directory.
+     *
+     * A manifest written against another root resolves nothing, and would
+     * otherwise report modules whose every path is silently empty.
+     *
+     * @param  array<string, string>  $modules
+     * @return bool
+     */
+    private function pathsResolve(array $modules): bool
+    {
+        foreach ($modules as $path) {
+            if (!is_dir($path)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Load the manifest file and validate its shape.
      *
-     * The signature key must be present, but may hold the null recorded for a
-     * modules directory that could not be read when the manifest was written.
+     * A file that cannot be parsed is treated as absent. The signature key must
+     * be present, but may hold the null recorded for a modules directory that
+     * could not be read when the manifest was written.
      *
      * @return array{signature: string|null, modules: array<string, string>}|null
      *
@@ -152,7 +176,13 @@ final readonly class ModuleManifest
             return null;
         }
 
-        $manifest = require $this->path;
+        // A manifest that will not parse is no more usable than one with the
+        // wrong shape, and discovery answers correctly either way.
+        try {
+            $manifest = require $this->path;
+        } catch (\ParseError) {
+            return null;
+        }
 
         // Paths are concatenated during resolution, so a non-string value would
         // otherwise raise a conversion warning on every request.

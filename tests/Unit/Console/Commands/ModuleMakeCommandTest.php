@@ -228,6 +228,38 @@ final class ModuleMakeCommandTest extends TestCase
     }
 
     /**
+     * Test that handle reports a name it had to rewrite, since the name decides
+     * the directory, the namespace and how resources are addressed.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
+     */
+    public function testHandleReportsANameItRewrote(): void
+    {
+        $this->runMakeCommand('order-management');
+
+        self::assertStringContainsString(
+            'Module name [order-management] was written as [OrderManagement].',
+            $this->output,
+        );
+    }
+
+    /**
+     * Test that handle says nothing extra when the name is used as given.
+     *
+     * @return void
+     *
+     * @throws \Symfony\Component\Console\Exception\ExceptionInterface
+     */
+    public function testHandleSaysNothingWhenTheNameIsUsedAsGiven(): void
+    {
+        $this->runMakeCommand('Billing');
+
+        self::assertStringNotContainsString('was written as', $this->output);
+    }
+
+    /**
      * Test that handle returns FAILURE when the module already exists.
      *
      * @return void

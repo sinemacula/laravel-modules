@@ -94,6 +94,12 @@ final class ModuleMakeCommand extends Command
             return self::FAILURE;
         }
 
+        // The name decides the directory, the namespace and how every resource
+        // is addressed, so a silent rewrite is worth saying out loud.
+        if ($name !== $argument) {
+            $this->components->warn("Module name [{$argument}] was written as [{$name}].");
+        }
+
         return $this->scaffold($filesystem, $name);
     }
 

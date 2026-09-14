@@ -28,8 +28,8 @@ final class Modules
     /** @var string The default module for resource resolution. */
     private const string DEFAULT_MODULE = 'foundation';
 
-    /** @var string The base path to the root application directory. */
-    private static string $basePath; // @phpstan-ignore sineMacula.mutableStaticProperty (intentional static state for the module facade)
+    /** @var string|null The base path to the root application directory. */
+    private static ?string $basePath = null; // @phpstan-ignore sineMacula.mutableStaticProperty (intentional static state for the module facade)
 
     /** @var array<string, string>|null The discovered module paths keyed by module name. */
     private static ?array $modules = null; // @phpstan-ignore sineMacula.mutableStaticProperty (intentional static state for the module facade)
@@ -46,18 +46,22 @@ final class Modules
      * changes; setting the same path again is a no-op. Paths already handed to
      * the application builder are not revisited.
      *
-     * @param  string  $path
+     * Passing null returns the resolver to its uninitialised state, which is
+     * the seam for a process that boots more than one application: leaving a
+     * base path behind makes the next boot depend on the order it ran in.
+     *
+     * @param  string|null  $path
      * @return void
      */
-    public static function setBasePath(string $path): void
+    public static function setBasePath(?string $path): void
     {
         // realpath('') resolves to the working directory rather than failing,
         // so an empty path is kept as given.
-        if ($path !== '') {
+        if ($path !== null && $path !== '') {
             $path = realpath($path) ?: $path;
         }
 
-        if ((self::$basePath ?? null) === $path) {
+        if (self::$basePath === $path) {
             return;
         }
 
@@ -123,8 +127,9 @@ final class Modules
      *
      * The next read resolves the module map again, from the manifest when one
      * exists and from discovery otherwise. The manifest file itself is left in
-     * place, and so is the base path, which is a typed static that cannot be
-     * returned to its uninitialised state once set.
+     * place, and so is the base path, which the caching commands rely on still
+     * being there after they flush. Pass null to setBasePath to discard that as
+     * well.
      *
      * @return void
      */
@@ -338,7 +343,7 @@ final class Modules
      */
     private static function buildPath(string $path): string
     {
-        if (!isset(self::$basePath)) {
+        if (self::$basePath === null) {
             throw new ModuleException('No base path has been set.');
         }
 

@@ -6,11 +6,15 @@ name: Tests
 # ==============================================================================
 # TRIGGERS
 # ==============================================================================
+# The weekly run re-resolves the unpinned dependency tree, so a breaking
+# framework release surfaces without waiting for the next pull request.
 on:
     push:
         branches: [ master ]
     pull_request:
         types: [ opened, synchronize, reopened, ready_for_review ]
+    schedule:
+        -   cron: 20 6 * * 3
     workflow_dispatch:
 
 # ==============================================================================

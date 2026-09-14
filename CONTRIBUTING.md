@@ -6,6 +6,7 @@ Contributions are welcome via GitHub pull requests. This guide covers the expect
 
 - PHP 8.3+
 - Composer 2
+- The qlty CLI - Composer does not install it, so add it separately with `curl https://qlty.sh | sh`
 
 ## Getting Started
 

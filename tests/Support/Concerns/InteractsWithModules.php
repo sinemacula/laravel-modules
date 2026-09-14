@@ -20,17 +20,16 @@ use SineMacula\Laravel\Modules\Configuration\Modules;
 trait InteractsWithModules
 {
     /**
-     * Discard the memoised module state.
+     * Return the resolver to its uninitialised state.
      *
-     * The base path is left as it is. It is a typed static with no default, so
-     * it cannot be returned to its uninitialised state once set; a test that
-     * needs it unset has to run in a separate process.
+     * Discards the base path along with the memoised maps, so a test needing no
+     * base path does not depend on which tests the worker ran before it.
      *
      * @return void
      */
     protected function resetModulesState(): void
     {
-        Modules::flush();
+        Modules::setBasePath(null);
     }
 
     /**

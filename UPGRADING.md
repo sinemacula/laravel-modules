@@ -71,6 +71,15 @@ The common way to reach it was a manifest written in one root and read in anothe
 a container build, or a `bootstrap/cache` shared across release directories. No action is needed; the first boot after
 upgrading rebuilds it.
 
+### A seam for tests that boot more than one application
+
+`Modules::setBasePath()` now accepts null, which returns the resolver to its uninitialised state, discarding the base
+path along with the memoised maps. `Modules::flush()` still keeps the base path, which is what the caching commands
+resolve against after they flush, so neither changes behaviour for an application that boots once.
+
+An application whose own test suite boots several modular applications in a process should pass null in teardown:
+leaving a base path behind makes the next boot depend on the order the tests ran in.
+
 ### Generated modules changed shape
 
 `module:make` emits stubs conforming to the current coding standards. Existing modules are untouched; only newly

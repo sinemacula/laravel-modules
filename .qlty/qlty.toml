@@ -67,15 +67,14 @@ mode = "comment"
 package_file = ".qlty/configs/composer.json"
 package_filters = ["slevomat", "dealerdirect", "sinemacula"]
 
-# Pinned to the last php-cs-fixer release whose symfony/console stays on the 7.x
-# line. 3.90+ pulls symfony/console 8 (requires PHP 8.4.1 and uses 8.4-only
-# syntax), which qlty's PHP 8.3 runner cannot parse. Bump once the runner ships
-# PHP 8.4.
+# Pinned to the version the shared standard requires. Symfony 8 is held off by
+# the conflict block in the package file, not by this pin, so the runner stays
+# on PHP 8.3.
 [[plugin]]
 name = "php-cs-fixer"
 package_file = ".qlty/configs/composer.json"
 package_filters = ["sinemacula"]
-version = "3.89.0"
+version = "3.95.25"
 
 [[plugin]]
 name = "phpstan"

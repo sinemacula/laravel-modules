@@ -20,8 +20,10 @@ on:
 # ==============================================================================
 # CONCURRENCY
 # ==============================================================================
+# The event name keeps scheduled and manual runs out of the push group, so a
+# merge to master cannot cancel one part way through.
 concurrency:
-    group: tests-${{ github.event.pull_request.number || github.ref }}
+    group: tests-${{ github.event.pull_request.number || github.ref }}-${{ github.event_name }}
     cancel-in-progress: true
 
 # ==============================================================================

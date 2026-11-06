@@ -33,7 +33,7 @@ test_patterns = [
 ]
 
 [runtimes.enabled]
-php = "8.3"
+php = "8.5"
 
 [smells]
 mode = "comment"
@@ -67,25 +67,13 @@ mode = "comment"
 package_file = ".qlty/configs/composer.json"
 package_filters = ["slevomat", "dealerdirect", "sinemacula"]
 
-# Pinned to the version the shared standard requires. From 3.90.0 the fixer
-# accepts Symfony 8, which needs PHP 8.4, so the Symfony components are held at
-# 7.4 to keep the runner on PHP 8.3. They have to be declared here rather than
-# in the package file, because qlty ignores extra_packages whenever
-# package_file is set on the same plugin.
+# Pinned to the version the shared standard requires. The standard is declared
+# here rather than in the package file, because qlty ignores extra_packages
+# whenever package_file is set on the same plugin.
 [[plugin]]
 name = "php-cs-fixer"
 version = "3.95.25"
-extra_packages = [
-    "sinemacula/coding-standards@1.28.0",
-    "symfony/console@^7.4",
-    "symfony/event-dispatcher@^7.4",
-    "symfony/filesystem@^7.4",
-    "symfony/finder@^7.4",
-    "symfony/options-resolver@^7.4",
-    "symfony/process@^7.4",
-    "symfony/stopwatch@^7.4",
-    "symfony/string@^7.4",
-]
+extra_packages = ["sinemacula/coding-standards@1.28.0"]
 
 [[plugin]]
 name = "phpstan"
@@ -115,9 +103,11 @@ name = "yamllint"
 # COMPOSER_VENDOR_DIR is pinned to the repository's vendor directory because
 # the plugin environment points it at the shared phpstan tool sandbox, where an
 # install would replace the pinned analysis stack. Only extension requirements
-# are ignored so the PHP version constraint still applies.
+# are ignored so the PHP version constraint still applies. Composer is found by
+# version because qlty names its install directory with a hash that changes
+# when qlty's composer does.
 [plugins.definitions.phpstan.drivers.lint]
-prepare_script = "COMPOSER_VENDOR_DIR=vendor ~/.qlty/cache/tools/composer/generic-42cc848a9f5e/composer.phar install --no-scripts --ignore-platform-req='ext-*'"
+prepare_script = "COMPOSER_VENDOR_DIR=vendor \"$(ls -d ~/.qlty/cache/tools/composer/[0-9]*/composer.phar | sort -V | tail -n 1)\" install --no-scripts --ignore-platform-req='ext-*'"
 
 # php-codesniffer 4.x exits with code 3 when it finds issues; qlty's default
 # success codes are [0, 1], so without this qlty treats a normal "issues found"

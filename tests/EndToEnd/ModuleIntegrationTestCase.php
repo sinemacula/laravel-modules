@@ -12,7 +12,7 @@ use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\View\Factory;
+use Illuminate\View\Factory;
 use Tests\EndToEndTestCase;
 
 /**
@@ -71,16 +71,17 @@ abstract class ModuleIntegrationTestCase extends EndToEndTestCase
      */
     public function testModuleViewsAreRendered(): void
     {
-        $views = $this->modularApplication()->make(Factory::class);
+        $views  = $this->modularApplication()->make(Factory::class);
+        $finder = $views->getFinder();
 
         static::assertSame(
             'billing-view:INV-1',
-            trim($views->make('billing::invoice', ['reference' => 'INV-1'])->render()),
+            trim($views->file($finder->find('billing::invoice'), ['reference' => 'INV-1'])->render()),
         );
 
         static::assertSame(
             'reporting-view:Q1',
-            trim($views->make('reporting::summary', ['period' => 'Q1'])->render()),
+            trim($views->file($finder->find('reporting::summary'), ['period' => 'Q1'])->render()),
         );
     }
 

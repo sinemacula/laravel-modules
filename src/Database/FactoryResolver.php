@@ -49,7 +49,7 @@ final class FactoryResolver
      * factories. Otherwise the module-scoped name is returned, including when
      * neither exists, so the resulting error names the documented location.
      *
-     * @param  class-string  $model
+     * @param  string  $model
      * @return string
      */
     public static function factoryNameFor(string $model): string

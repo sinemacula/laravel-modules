@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/sinemacula/laravel-modules/compare/v1.4.0...v1.4.1) (2026-11-10)
+
+
+### Bug Fixes
+
+* clear the qlty findings and drop configuration the shared source provides ([#107](https://github.com/sinemacula/laravel-modules/issues/107)) ([1a82324](https://github.com/sinemacula/laravel-modules/commit/1a82324a37894f6f71b4d242eb9c003a6e723c97))
+
 ## [1.4.0](https://github.com/sinemacula/laravel-modules/compare/v1.3.0...v1.4.0) (2026-09-22)
 
 

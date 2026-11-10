@@ -16,6 +16,7 @@ exclude_patterns = [
     "**/dist/**",
     "**/node_modules/**",
     "**/vendor/**",
+    ".claude/**",
     ".qlty/configs/**",
     ".sinemacula/**",
 ]
@@ -32,12 +33,6 @@ test_patterns = [
     "**/spec_*.*",
 ]
 
-[runtimes.enabled]
-php = "8.5"
-
-[smells]
-mode = "comment"
-
 [[source]]
 name = "default"
 default = true
@@ -48,22 +43,7 @@ repository = "https://github.com/sinemacula/coding-standards"
 tag = "v1.30.0"
 
 [[plugin]]
-name = "actionlint"
-
-[[plugin]]
-name = "editorconfig-checker"
-
-[[plugin]]
-name = "markdownlint"
-mode = "comment"
-
-[[plugin]]
-name = "osv-scanner"
-
-[[plugin]]
 name = "php-codesniffer"
-version = "4.0.4"
-mode = "comment"
 package_file = ".qlty/configs/composer.json"
 package_filters = ["slevomat", "dealerdirect", "sinemacula"]
 
@@ -72,31 +52,12 @@ package_filters = ["slevomat", "dealerdirect", "sinemacula"]
 # whenever package_file is set on the same plugin.
 [[plugin]]
 name = "php-cs-fixer"
-version = "3.95.25"
 extra_packages = ["sinemacula/coding-standards@1.30.0"]
 
 [[plugin]]
 name = "phpstan"
-version = "2.1.46"
 package_file = ".qlty/configs/composer.json"
 package_filters = ["phpstan", "larastan", "sinemacula"]
-
-[[plugin]]
-name = "radarlint-php"
-mode = "comment"
-
-[[plugin]]
-name = "trivy"
-drivers = [
-    "config",
-    "fs-vuln",
-]
-
-[[plugin]]
-name = "trufflehog"
-
-[[plugin]]
-name = "yamllint"
 
 # phpstan resolves framework symbols by autoloading the package's own
 # dependencies, which a bare checkout does not have, so install them first.
@@ -109,21 +70,12 @@ name = "yamllint"
 [plugins.definitions.phpstan.drivers.lint]
 prepare_script = "COMPOSER_VENDOR_DIR=vendor \"$(ls -d ~/.qlty/cache/tools/composer/[0-9]*/composer.phar | sort -V | tail -n 1)\" install --no-scripts --ignore-platform-req='ext-*'"
 
-# php-codesniffer 4.x exits with code 3 when it finds issues; qlty's default
-# success codes are [0, 1], so without this qlty treats a normal "issues found"
-# run as a hard failure and silently drops every phpcs finding (false green).
-# This must live here in the consumer's qlty.toml - a qlty bug drops all of a
-# source's exported configs if the block is placed in the shared source.toml.
-[plugins.definitions.php-codesniffer.drivers.lint]
-success_codes = [0, 1, 2, 3]
-
-# Skip radarlint smell analysis on the test and benchmark trees. Reused fixture
-# literals, multi-branch data providers, and benchmark subjects that share a body
-# but differ only in their setup/attributes trip duplication and return-count
-# rules without value.
+# Skip radarlint smell analysis on the benchmark tree. Benchmark subjects that
+# share a body but differ only in their setup/attributes trip duplication rules
+# without value.
 [[exclude]]
 plugins = ["radarlint-php"]
-file_patterns = ["benchmarks/**", "tests/**"]
+file_patterns = ["benchmarks/**"]
 
 # The end-to-end fixture is a miniature consumer application checked in as test
 # data. It follows Laravel's application conventions rather than this package's

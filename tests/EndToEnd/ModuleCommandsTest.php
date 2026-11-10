@@ -74,6 +74,7 @@ final class ModuleCommandsTest extends EndToEndTestCase
         $manifest = require $this->fixtureAppPath . '/bootstrap/cache/modules.php';
 
         self::assertIsArray($manifest);
+        self::assertIsArray($manifest['modules']);
         self::assertArrayHasKey('billing', $manifest['modules']);
         self::assertArrayHasKey('reporting', $manifest['modules']);
     }

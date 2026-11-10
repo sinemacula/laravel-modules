@@ -145,6 +145,8 @@ final class ModulesIntegrationTest extends TestCase
         self::assertFileExists($cachePath);
 
         $content = file_get_contents($cachePath);
+
+        self::assertIsString($content);
         self::assertStringStartsWith('<?php', $content);
 
         $modules = require $cachePath;

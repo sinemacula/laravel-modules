@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Tests\EndToEnd;
 
 use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\View\Factory;
+use Illuminate\View\Factory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use SineMacula\Laravel\Modules\Configuration\Modules;
 use SineMacula\Laravel\Modules\Console\Commands\ModuleCacheCommand;
@@ -43,11 +43,12 @@ final class ModuleCacheCommandBootTest extends EndToEndTestCase
      */
     public function testModuleResourcesResolveFromAForeignCache(): void
     {
-        $app = $this->modularApplication();
+        $app   = $this->modularApplication();
+        $views = $app->make(Factory::class);
 
         self::assertSame(
             'billing-view:INV-9',
-            trim($app->make(Factory::class)->make('billing::invoice', ['reference' => 'INV-9'])->render()),
+            trim($views->file($views->getFinder()->find('billing::invoice'), ['reference' => 'INV-9'])->render()),
         );
 
         self::assertSame(
